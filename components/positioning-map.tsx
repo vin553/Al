@@ -46,7 +46,7 @@ export function PositioningMap({ vendors }: { vendors: Vendor[] }) {
         <CardContent>
           <div className="h-[460px] w-full">
             <ResponsiveContainer>
-              <ScatterChart margin={{ top: 16, right: 32, bottom: 32, left: 16 }}>
+              <ScatterChart margin={{ top: 16, right: 96, bottom: 32, left: 16 }}>
                 <CartesianGrid stroke="hsl(var(--border) / 0.6)" strokeDasharray="2 4" />
                 <XAxis
                   type="number"
@@ -107,7 +107,18 @@ export function PositioningMap({ vendors }: { vendors: Vendor[] }) {
                     );
                   }}
                 />
-                <Scatter data={data} fill="hsl(220 80% 60%)" fillOpacity={0.85} />
+                <Scatter
+                  data={data}
+                  fill="hsl(220 80% 60%)"
+                  fillOpacity={0.85}
+                  label={{
+                    dataKey: "name",
+                    position: "right",
+                    offset: 10,
+                    fill: "hsl(var(--foreground) / 0.85)",
+                    fontSize: 11,
+                  }}
+                />
               </ScatterChart>
             </ResponsiveContainer>
           </div>
