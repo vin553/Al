@@ -13,5 +13,5 @@ test-results
 .vercel
 data/*.db
 data/*.db-journal
-data/screenshots/*.png
-!data/screenshots/.gitkeep
+data/*.db-shm
+data/*.db-wal
