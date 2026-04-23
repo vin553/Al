@@ -1,0 +1,17 @@
+node_modules
+.next
+out
+dist
+.env
+.env.local
+.env*.local
+*.log
+.DS_Store
+coverage
+playwright-report
+test-results
+.vercel
+data/*.db
+data/*.db-journal
+data/screenshots/*.png
+!data/screenshots/.gitkeep
