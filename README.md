@@ -55,14 +55,22 @@ To reset the data, delete `data/cleaning.db*` and restart — it reseeds.
 - **Jobs & customers** — `data/jobs.seed.json`, regenerated from the monthly
   schedule spreadsheets. New jobs entered in the app are stored in SQLite.
 
-## Email sending
+## Customer confirmations (WhatsApp / SMS / email)
 
-The confirmation email is fully composed (subject + body, customer-addressed) and
-previewed before sending. With no SMTP credentials wired up, **Send confirmation**
-records the send and offers an "Open in mail app" (`mailto:`) fallback. Imported
-customers have phone numbers but no email yet — add an email on the booking to send
-a confirmation. To send automatically, plug an email provider (Resend / SendGrid /
-SMTP) into `app/api/bookings/[id]/email/route.ts`.
+After a booking is created, staff can send the customer a confirmation:
+
+- **WhatsApp (primary)** — the message is pre-composed and a **Send via WhatsApp**
+  button opens `wa.me/<number>` with the text ready to send. No API keys needed; it
+  uses the staff member's own WhatsApp. Phone numbers are auto-normalised to the
+  Singapore `+65` format. An **SMS** fallback link (`sms:`) is provided too.
+- **Email** — fully composed and previewed; **Send confirmation** records the send
+  with an "Open in mail app" (`mailto:`) fallback. Imported customers have phone
+  numbers but no email yet, so the email panel prompts to add one.
+
+The app tracks, per job, whether a WhatsApp/SMS and/or email confirmation was sent.
+To send WhatsApp/SMS automatically (unattended), plug in a provider such as Twilio
+or the WhatsApp Business API at `app/api/bookings/[id]/whatsapp/route.ts`; for email,
+Resend / SendGrid / SMTP at `app/api/bookings/[id]/email/route.ts`.
 
 ## Screenshots
 
@@ -73,3 +81,7 @@ SMTP) into `app/api/bookings/[id]/email/route.ts`.
 | Jobs | Customers |
 | --- | --- |
 | ![Jobs](docs/screenshots/bookings.png) | ![Customers](docs/screenshots/customers.png) |
+
+Booking confirmation with WhatsApp / SMS / email:
+
+![Booking confirmation](docs/screenshots/booking-confirm.png)

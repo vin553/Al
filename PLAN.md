@@ -16,6 +16,7 @@ Built:
 - [x] Weekly booking calendar, colour-coded by cleaner, click-to-book
 - [x] New-booking flow with hours-based auto-pricing + double-booking guard
 - [x] Customer confirmation email: compose, preview, send (+ mailto fallback)
+- [x] WhatsApp/SMS confirmation: pre-filled wa.me + sms links, send tracked per job
 - [x] Jobs list with job-status + payment-status management and email status
 - [x] Cleaners roster with per-cleaner utilisation; Customers ranked by revenue
 
@@ -25,8 +26,8 @@ Built:
 - [ ] Confirmation the S$17/hour rate is correct (or per-customer rates)
 
 ## Possible next steps
-- [ ] Wire a real email provider (Resend/SendGrid/SMTP) for automatic sending
-- [ ] WhatsApp/SMS confirmation (customers are tracked by phone today)
+- [ ] Automatic/unattended sending: Twilio or WhatsApp Business API (today it's
+      click-to-send via the staff member's own WhatsApp), plus an email provider
 - [ ] Staff login / roles
 - [ ] Monthly spreadsheet import button (drop in the next month's schedule)
 - [ ] Payment capture (Stripe) and invoicing

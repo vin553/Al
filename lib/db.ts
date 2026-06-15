@@ -45,9 +45,15 @@ export function getDb(): Database.Database {
       payment_status TEXT NOT NULL,
       remark TEXT NOT NULL DEFAULT '',
       email_sent INTEGER NOT NULL DEFAULT 0,
+      whatsapp_sent INTEGER NOT NULL DEFAULT 0,
       created_at TEXT NOT NULL
     );
   `);
+  // Migration for databases created before whatsapp_sent existed.
+  const cols = _db.prepare("PRAGMA table_info(bookings)").all() as { name: string }[];
+  if (!cols.some((c) => c.name === "whatsapp_sent")) {
+    _db.exec("ALTER TABLE bookings ADD COLUMN whatsapp_sent INTEGER NOT NULL DEFAULT 0");
+  }
   ensureSeeded(_db);
   return _db;
 }
@@ -79,9 +85,9 @@ function ensureSeeded(db: Database.Database) {
 function insertBookingRow(db: Database.Database, b: Booking) {
   db.prepare(
     `INSERT INTO bookings
-      (id, customer_id, cleaner_id, date, start_time, end_time, hours, amount, job_status, payment_status, remark, email_sent, created_at)
-     VALUES (@id, @customerId, @cleanerId, @date, @startTime, @endTime, @hours, @amount, @jobStatus, @paymentStatus, @remark, @emailSent, @createdAt)`
-  ).run({ ...b, emailSent: b.emailSent ? 1 : 0 });
+      (id, customer_id, cleaner_id, date, start_time, end_time, hours, amount, job_status, payment_status, remark, email_sent, whatsapp_sent, created_at)
+     VALUES (@id, @customerId, @cleanerId, @date, @startTime, @endTime, @hours, @amount, @jobStatus, @paymentStatus, @remark, @emailSent, @whatsappSent, @createdAt)`
+  ).run({ ...b, emailSent: b.emailSent ? 1 : 0, whatsappSent: b.whatsappSent ? 1 : 0 });
 }
 
 interface BookingRow {
@@ -97,6 +103,7 @@ interface BookingRow {
   payment_status: string;
   remark: string;
   email_sent: number;
+  whatsapp_sent: number;
   created_at: string;
 }
 
@@ -114,6 +121,7 @@ function rowToBooking(r: BookingRow): Booking {
     paymentStatus: r.payment_status as PaymentStatus,
     remark: r.remark,
     emailSent: !!r.email_sent,
+    whatsappSent: !!r.whatsapp_sent,
     createdAt: r.created_at,
   };
 }
@@ -220,6 +228,7 @@ export function createBooking(input: NewBookingInput): BookingDetail {
     paymentStatus: input.paymentStatus ?? "unbilled",
     remark: input.remark ?? "",
     emailSent: false,
+    whatsappSent: false,
     createdAt: new Date().toISOString(),
   };
   insertBookingRow(db, booking);
@@ -236,6 +245,10 @@ export function updatePaymentStatus(id: string, status: PaymentStatus): void {
 
 export function markEmailSent(id: string): void {
   getDb().prepare("UPDATE bookings SET email_sent = 1 WHERE id = ?").run(id);
+}
+
+export function markWhatsappSent(id: string): void {
+  getDb().prepare("UPDATE bookings SET whatsapp_sent = 1 WHERE id = ?").run(id);
 }
 
 export function deleteBooking(id: string): void {

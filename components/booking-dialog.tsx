@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatSgd } from "@/lib/utils";
 import { addHoursToTime, formatTime12 } from "@/lib/dates";
 import type { BookingDetail, Cleaner, Customer, PaymentStatus } from "@/lib/types";
-import { CheckCircle2, Loader2, Mail, X } from "lucide-react";
+import { CheckCircle2, Loader2, Mail, MessageCircle, X } from "lucide-react";
 
 interface Props {
   cleaners: Cleaner[];
@@ -54,6 +54,10 @@ export function BookingDialog({ cleaners, customers, hourlyRate, initial, onClos
   const [mailto, setMailto] = useState<string>("");
   const [emailSending, setEmailSending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+
+  const [wa, setWa] = useState<{ text: string; waLink: string; smsLink: string; phone: string } | null>(null);
+  const [waSent, setWaSent] = useState(false);
+  const [waSending, setWaSending] = useState(false);
 
   // Auto-fill amount = hours × rate until the staff member edits it.
   useEffect(() => {
@@ -121,6 +125,11 @@ export function BookingDialog({ cleaners, customers, hourlyRate, initial, onClos
         setEmailPreview(ed.email);
         setMailto(ed.mailto);
       }
+      const wr = await fetch(`/api/bookings/${data.booking.id}/whatsapp`);
+      if (wr.ok) {
+        const wd = await wr.json();
+        setWa(wd.message);
+      }
       setStep("created");
     } catch {
       setError("Network error — please try again.");
@@ -143,7 +152,24 @@ export function BookingDialog({ cleaners, customers, hourlyRate, initial, onClos
     }
   }
 
+  async function sendWhatsApp() {
+    if (!created) return;
+    // Open WhatsApp/SMS for the staff member, then record the send.
+    if (wa?.waLink) window.open(wa.waLink, "_blank");
+    setWaSending(true);
+    try {
+      const res = await fetch(`/api/bookings/${created.id}/whatsapp`, { method: "POST" });
+      if (res.ok) {
+        setWaSent(true);
+        onChanged();
+      }
+    } finally {
+      setWaSending(false);
+    }
+  }
+
   const hasEmail = !!created?.customer.email?.trim();
+  const hasPhone = !!wa?.phone;
 
   return (
     <div
@@ -305,6 +331,53 @@ export function BookingDialog({ cleaners, customers, hourlyRate, initial, onClos
                 <div className="mt-1 font-semibold">{formatSgd(created.amount)}</div>
               </div>
             )}
+
+            <div className="rounded-lg border border-emerald-500/40">
+              <div className="flex items-center gap-2 border-b border-emerald-500/30 bg-emerald-500/5 px-4 py-2 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                <MessageCircle className="h-3.5 w-3.5" /> WhatsApp / SMS confirmation
+              </div>
+              {hasPhone && wa ? (
+                <div className="space-y-2 p-4 text-xs">
+                  <div>
+                    <span className="text-muted-foreground">To:</span> +{wa.phone}
+                  </div>
+                  <pre className="max-h-40 overflow-auto whitespace-pre-wrap rounded bg-muted/40 p-3 font-sans text-[11px] leading-relaxed text-foreground">
+                    {wa.text}
+                  </pre>
+                  <div className="flex items-center justify-between gap-2 pt-1">
+                    {waSent ? (
+                      <Badge variant="success" className="gap-1">
+                        <CheckCircle2 className="h-3 w-3" /> Sent via WhatsApp
+                      </Badge>
+                    ) : (
+                      <span className="text-muted-foreground">Opens WhatsApp with the message ready to send.</span>
+                    )}
+                    <div className="flex gap-2">
+                      {wa.smsLink && (
+                        <a href={wa.smsLink}>
+                          <Button variant="outline" size="sm">
+                            SMS
+                          </Button>
+                        </a>
+                      )}
+                      <Button
+                        onClick={sendWhatsApp}
+                        disabled={waSending || waSent}
+                        size="sm"
+                        className="bg-emerald-600 text-white hover:bg-emerald-700"
+                      >
+                        {waSending && <Loader2 className="h-4 w-4 animate-spin" />}
+                        {waSent ? "Sent" : "Send via WhatsApp"}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-4 text-xs text-muted-foreground">
+                  No phone number on file — add one on the booking to send a WhatsApp/SMS confirmation.
+                </div>
+              )}
+            </div>
 
             <div className="rounded-lg border">
               <div className="flex items-center gap-2 border-b px-4 py-2 text-xs font-medium text-muted-foreground">

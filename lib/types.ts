@@ -58,6 +58,7 @@ export interface Booking {
   paymentStatus: PaymentStatus;
   remark: string;
   emailSent: boolean;
+  whatsappSent: boolean;
   createdAt: string; // ISO
 }
 

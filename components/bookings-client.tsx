@@ -10,7 +10,7 @@ import { BookingDialog } from "@/components/booking-dialog";
 import { formatSgd } from "@/lib/utils";
 import { formatDateShort, formatTime12 } from "@/lib/dates";
 import type { BookingDetail, Cleaner, Customer, JobStatus, PaymentStatus } from "@/lib/types";
-import { Mail, Plus } from "lucide-react";
+import { Mail, MessageCircle, Plus } from "lucide-react";
 
 interface Props {
   bookings: BookingDetail[];
@@ -106,7 +106,8 @@ export function BookingsClient({ bookings, cleaners, customers, hourlyRate, open
                   <div className="flex items-center gap-1.5 font-medium">
                     <span className="h-2 w-2 rounded-full" style={{ background: b.cleaner.color }} />
                     {b.customer.name}
-                    {b.emailSent && <Mail className="h-3 w-3 text-emerald-500" aria-label="Emailed" />}
+                    {b.whatsappSent && <MessageCircle className="h-3 w-3 text-emerald-500" aria-label="WhatsApp sent" />}
+                    {b.emailSent && <Mail className="h-3 w-3 text-sky-500" aria-label="Emailed" />}
                   </div>
                   <div className="text-xs text-muted-foreground">{b.customer.code || b.customer.phone}</div>
                 </td>
