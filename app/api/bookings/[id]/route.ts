@@ -1,21 +1,38 @@
 import { NextResponse } from "next/server";
-import { deleteBooking, getBookingDetail, updateBookingStatus } from "@/lib/db";
-import type { BookingStatus } from "@/lib/types";
+import {
+  deleteBooking,
+  getBookingDetail,
+  updateJobStatus,
+  updatePaymentStatus,
+} from "@/lib/db";
+import type { JobStatus, PaymentStatus } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const VALID: BookingStatus[] = ["confirmed", "completed", "cancelled"];
+const JOB: JobStatus[] = ["scheduled", "completed", "cancelled"];
+const PAY: PaymentStatus[] = ["unbilled", "pending", "done"];
 
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
-  const body = (await req.json().catch(() => ({}))) as { status?: BookingStatus };
-  if (!body.status || !VALID.includes(body.status)) {
-    return NextResponse.json({ error: "Invalid status" }, { status: 400 });
-  }
+  const body = (await req.json().catch(() => ({}))) as {
+    jobStatus?: JobStatus;
+    paymentStatus?: PaymentStatus;
+  };
   if (!getBookingDetail(params.id)) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
-  updateBookingStatus(params.id, body.status);
+  if (body.jobStatus) {
+    if (!JOB.includes(body.jobStatus)) {
+      return NextResponse.json({ error: "Invalid job status" }, { status: 400 });
+    }
+    updateJobStatus(params.id, body.jobStatus);
+  }
+  if (body.paymentStatus) {
+    if (!PAY.includes(body.paymentStatus)) {
+      return NextResponse.json({ error: "Invalid payment status" }, { status: 400 });
+    }
+    updatePaymentStatus(params.id, body.paymentStatus);
+  }
   return NextResponse.json({ booking: getBookingDetail(params.id) });
 }
 

@@ -12,8 +12,12 @@ export interface ComposedEmail {
   html: string;
 }
 
+function fullAddress(b: BookingDetail): string {
+  return [b.customer.address, b.customer.postal].filter(Boolean).join(", ");
+}
+
 export function composeConfirmation(b: BookingDetail): ComposedEmail {
-  const subject = `Booking confirmed — ${b.package.name} on ${formatDateLong(b.date)}`;
+  const subject = `Booking confirmed — cleaning on ${formatDateLong(b.date)}`;
   const ref = b.id.toUpperCase();
 
   const lines = [
@@ -22,13 +26,12 @@ export function composeConfirmation(b: BookingDetail): ComposedEmail {
     `Thank you for booking with ${COMPANY.name}. Your cleaning service is confirmed.`,
     ``,
     `Booking reference: ${ref}`,
-    `Service: ${b.package.name}`,
     `Date: ${formatDateLong(b.date)}`,
-    `Time: ${formatTime12(b.startTime)} – ${formatTime12(b.endTime)}`,
-    `Address: ${b.customer.address}`,
+    `Time: ${formatTime12(b.startTime)} – ${formatTime12(b.endTime)} (${b.hours} hours)`,
+    `Location: ${fullAddress(b)}`,
     `Assigned cleaner: ${b.cleaner.name} (${b.cleaner.code})`,
     `Amount payable: ${formatSgd(b.amount)}`,
-    b.notes ? `Notes: ${b.notes}` : ``,
+    b.remark ? `Notes: ${b.remark}` : ``,
     ``,
     `If you need to reschedule, please contact us at ${COMPANY.phone} or reply to this email.`,
     ``,
@@ -54,13 +57,12 @@ export function composeConfirmation(b: BookingDetail): ComposedEmail {
         <p style="margin:0 0 16px;color:#334155">Thank you for booking with us. Your cleaning service is <strong>confirmed</strong>.</p>
         <table style="border-collapse:collapse;width:100%;margin:8px 0 16px">
           ${row("Reference", ref)}
-          ${row("Service", b.package.name)}
           ${row("Date", formatDateLong(b.date))}
-          ${row("Time", `${formatTime12(b.startTime)} – ${formatTime12(b.endTime)}`)}
-          ${row("Address", b.customer.address)}
+          ${row("Time", `${formatTime12(b.startTime)} – ${formatTime12(b.endTime)} (${b.hours}h)`)}
+          ${row("Location", fullAddress(b))}
           ${row("Cleaner", `${b.cleaner.name} (${b.cleaner.code})`)}
           ${row("Amount", formatSgd(b.amount))}
-          ${b.notes ? row("Notes", b.notes) : ""}
+          ${b.remark ? row("Notes", b.remark) : ""}
         </table>
         <p style="margin:0 0 4px;color:#334155;font-size:14px">Need to reschedule? Call ${COMPANY.phone} or reply to this email.</p>
         <p style="margin:16px 0 0;color:#64748b;font-size:13px">Warm regards,<br/>${COMPANY.name}<br/>${COMPANY.phone} · ${COMPANY.email}</p>

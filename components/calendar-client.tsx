@@ -15,19 +15,19 @@ import {
   today,
   weekDates,
 } from "@/lib/dates";
-import type { BookingDetail, Cleaner, Customer, Package } from "@/lib/types";
+import type { BookingDetail, Cleaner, Customer } from "@/lib/types";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 
 interface Props {
   bookings: BookingDetail[];
-  packages: Package[];
   cleaners: Cleaner[];
   customers: Customer[];
+  hourlyRate: number;
 }
 
-const HOURS = Array.from({ length: 11 }, (_, i) => 8 + i); // 8am–6pm slots
+const HOURS = Array.from({ length: 14 }, (_, i) => 7 + i); // 7am–8pm slots
 
-export function CalendarClient({ bookings, packages, cleaners, customers }: Props) {
+export function CalendarClient({ bookings, cleaners, customers, hourlyRate }: Props) {
   const router = useRouter();
   const [weekStart, setWeekStart] = useState(startOfWeek(today()));
   const [cleanerFilter, setCleanerFilter] = useState("all");
@@ -40,7 +40,7 @@ export function CalendarClient({ bookings, packages, cleaners, customers }: Prop
     () =>
       bookings.filter(
         (b) =>
-          b.status !== "cancelled" &&
+          b.jobStatus !== "cancelled" &&
           b.date >= days[0] &&
           b.date <= days[6] &&
           (cleanerFilter === "all" || b.cleanerId === cleanerFilter)
@@ -77,11 +77,7 @@ export function CalendarClient({ bookings, packages, cleaners, customers }: Prop
         <div className="text-sm font-medium">
           {formatDateShort(days[0])} – {formatDateShort(days[6])}
         </div>
-        <Select
-          value={cleanerFilter}
-          onChange={(e) => setCleanerFilter(e.target.value)}
-          className="ml-auto w-44"
-        >
+        <Select value={cleanerFilter} onChange={(e) => setCleanerFilter(e.target.value)} className="ml-auto w-44">
           <option value="all">All cleaners</option>
           {cleaners.map((c) => (
             <option key={c.id} value={c.id}>
@@ -91,9 +87,17 @@ export function CalendarClient({ bookings, packages, cleaners, customers }: Prop
         </Select>
       </div>
 
+      <div className="flex flex-wrap gap-3 text-xs">
+        {cleaners.map((c) => (
+          <span key={c.id} className="flex items-center gap-1.5 text-muted-foreground">
+            <span className="h-2.5 w-2.5 rounded-full" style={{ background: c.color }} />
+            {c.code}
+          </span>
+        ))}
+      </div>
+
       <div className="overflow-x-auto rounded-xl border">
         <div className="min-w-[820px]">
-          {/* header row */}
           <div className="grid grid-cols-[56px_repeat(7,1fr)] border-b bg-muted/40 text-xs">
             <div className="px-2 py-2" />
             {days.map((d) => (
@@ -125,8 +129,8 @@ export function CalendarClient({ bookings, packages, cleaners, customers }: Prop
                       <div
                         key={b.id}
                         className="mb-1 rounded-md px-1.5 py-1 text-[11px] leading-tight text-white shadow-sm"
-                        style={{ background: b.package.color }}
-                        title={`${b.package.name} · ${b.customer.name} · ${formatSgd(b.amount)}`}
+                        style={{ background: b.cleaner.color }}
+                        title={`${b.customer.name} · ${b.cleaner.name} · ${formatTime12(b.startTime)}–${formatTime12(b.endTime)} · ${formatSgd(b.amount)}`}
                       >
                         <div className="font-semibold">
                           {formatTime12(b.startTime)} {b.cleaner.code}
@@ -148,14 +152,14 @@ export function CalendarClient({ bookings, packages, cleaners, customers }: Prop
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Tip: click any empty slot to start a booking pre-filled with that day and time.
+        Tip: click any empty slot to start a booking pre-filled with that day and time. Blocks are coloured by cleaner.
       </p>
 
       {dialog && (
         <BookingDialog
-          packages={packages}
           cleaners={cleaners}
           customers={customers}
+          hourlyRate={hourlyRate}
           initial={{ date: dialog.date, startTime: dialog.startTime }}
           onClose={() => {
             setDialog(null);

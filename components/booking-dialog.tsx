@@ -7,23 +7,24 @@ import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { formatSgd } from "@/lib/utils";
 import { addHoursToTime, formatTime12 } from "@/lib/dates";
-import type { BookingDetail, Cleaner, Customer, Package } from "@/lib/types";
+import type { BookingDetail, Cleaner, Customer, PaymentStatus } from "@/lib/types";
 import { CheckCircle2, Loader2, Mail, X } from "lucide-react";
 
 interface Props {
-  packages: Package[];
   cleaners: Cleaner[];
   customers: Customer[];
+  hourlyRate: number;
   initial?: { date?: string; startTime?: string; cleanerId?: string };
   onClose: () => void;
   onChanged: () => void;
 }
 
-const TIME_SLOTS = Array.from({ length: 11 }, (_, i) => `${String(8 + i).padStart(2, "0")}:00`);
+const TIME_SLOTS = Array.from({ length: 15 }, (_, i) => `${String(7 + i).padStart(2, "0")}:00`);
+const HOURS_OPTIONS = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 10];
 
 type EmailPreview = { to: string; subject: string; text: string };
 
-export function BookingDialog({ packages, cleaners, customers, initial, onClose, onChanged }: Props) {
+export function BookingDialog({ cleaners, customers, hourlyRate, initial, onClose, onChanged }: Props) {
   const activeCleaners = cleaners.filter((c) => c.active);
   const [step, setStep] = useState<"form" | "created">("form");
   const [submitting, setSubmitting] = useState(false);
@@ -31,19 +32,22 @@ export function BookingDialog({ packages, cleaners, customers, initial, onClose,
 
   // Customer
   const [customerId, setCustomerId] = useState<string>("new");
+  const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const [postal, setPostal] = useState("");
 
   // Booking
-  const [packageId, setPackageId] = useState(packages[0]?.id ?? "");
   const [cleanerId, setCleanerId] = useState(initial?.cleanerId ?? activeCleaners[0]?.id ?? "");
   const [date, setDate] = useState(initial?.date ?? "");
   const [startTime, setStartTime] = useState(initial?.startTime ?? "09:00");
-  const [amount, setAmount] = useState<string>("");
+  const [hours, setHours] = useState(3);
+  const [amount, setAmount] = useState<string>(String(3 * hourlyRate));
   const [amountTouched, setAmountTouched] = useState(false);
-  const [notes, setNotes] = useState("");
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>("unbilled");
+  const [remark, setRemark] = useState("");
 
   const [created, setCreated] = useState<BookingDetail | null>(null);
   const [emailPreview, setEmailPreview] = useState<EmailPreview | null>(null);
@@ -51,32 +55,32 @@ export function BookingDialog({ packages, cleaners, customers, initial, onClose,
   const [emailSending, setEmailSending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
 
-  const selectedPackage = useMemo(() => packages.find((p) => p.id === packageId), [packages, packageId]);
-
-  // Auto-fill amount from package price until the staff member edits it.
+  // Auto-fill amount = hours × rate until the staff member edits it.
   useEffect(() => {
-    if (!amountTouched && selectedPackage) setAmount(String(selectedPackage.price));
-  }, [selectedPackage, amountTouched]);
+    if (!amountTouched) setAmount(String(Math.round(hours * hourlyRate)));
+  }, [hours, hourlyRate, amountTouched]);
 
-  // When picking an existing customer, prefill contact fields.
+  // When picking an existing customer, prefill their details.
   useEffect(() => {
     if (customerId === "new") return;
     const c = customers.find((x) => x.id === customerId);
     if (c) {
+      setCode(c.code);
       setName(c.name);
       setEmail(c.email);
       setPhone(c.phone);
       setAddress(c.address);
+      setPostal(c.postal);
     }
   }, [customerId, customers]);
 
-  const endTime = selectedPackage ? addHoursToTime(startTime, selectedPackage.durationHours) : startTime;
+  const endTime = useMemo(() => addHoursToTime(startTime, hours), [startTime, hours]);
 
   async function submit() {
     setError(null);
-    if (!name.trim() || !email.trim()) return setError("Customer name and email are required.");
+    if (!name.trim()) return setError("Customer name is required.");
     if (!date) return setError("Please choose a date.");
-    if (!packageId || !cleanerId) return setError("Please choose a package and cleaner.");
+    if (!cleanerId) return setError("Please assign a cleaner.");
     const amt = Number(amount);
     if (!Number.isFinite(amt) || amt < 0) return setError("Please enter a valid amount.");
 
@@ -86,13 +90,22 @@ export function BookingDialog({ packages, cleaners, customers, initial, onClose,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customer: { id: customerId === "new" ? undefined : customerId, name, email, phone, address },
-          packageId,
+          customer: {
+            id: customerId === "new" ? undefined : customerId,
+            code,
+            name,
+            email,
+            phone,
+            address,
+            postal,
+          },
           cleanerId,
           date,
           startTime,
+          hours,
           amount: amt,
-          notes,
+          paymentStatus,
+          remark,
         }),
       });
       const data = await res.json();
@@ -102,7 +115,6 @@ export function BookingDialog({ packages, cleaners, customers, initial, onClose,
       }
       setCreated(data.booking);
       onChanged();
-      // Pull the email preview for this new booking.
       const er = await fetch(`/api/bookings/${data.booking.id}/email`);
       if (er.ok) {
         const ed = await er.json();
@@ -131,6 +143,8 @@ export function BookingDialog({ packages, cleaners, customers, initial, onClose,
     }
   }
 
+  const hasEmail = !!created?.customer.email?.trim();
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4 backdrop-blur-sm"
@@ -156,17 +170,24 @@ export function BookingDialog({ packages, cleaners, customers, initial, onClose,
                 <option value="new">+ New customer</option>
                 {customers.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.name} · {c.email}
+                    {c.code ? `${c.code} · ` : ""}
+                    {c.name}
                   </option>
                 ))}
               </Select>
             </Field>
 
             <div className="grid grid-cols-2 gap-3">
+              <Field label="Customer code">
+                <Input value={code} onChange={(e) => setCode(e.target.value)} placeholder="MCC0123" />
+              </Field>
               <Field label="Name">
                 <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Customer name" />
               </Field>
-              <Field label="Email">
+              <Field label="Phone">
+                <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="9xxx xxxx" />
+              </Field>
+              <Field label="Email (for confirmation)">
                 <Input
                   type="email"
                   value={email}
@@ -174,29 +195,18 @@ export function BookingDialog({ packages, cleaners, customers, initial, onClose,
                   placeholder="name@email.com"
                 />
               </Field>
-              <Field label="Phone">
-                <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+65 ..." />
-              </Field>
-              <Field label="Address">
-                <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Unit, street, postal" />
-              </Field>
             </div>
 
-            <Field label="Package">
-              <Select
-                value={packageId}
-                onChange={(e) => {
-                  setPackageId(e.target.value);
-                  setAmountTouched(false);
-                }}
-              >
-                {packages.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} — {p.durationHours}h · {formatSgd(p.price)}
-                  </option>
-                ))}
-              </Select>
-            </Field>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="col-span-2">
+                <Field label="Address">
+                  <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Block, street, unit" />
+                </Field>
+              </div>
+              <Field label="Postal">
+                <Input value={postal} onChange={(e) => setPostal(e.target.value)} placeholder="Singapore 5xxxxx" />
+              </Field>
+            </div>
 
             <div className="grid grid-cols-3 gap-3">
               <Field label="Date">
@@ -211,6 +221,24 @@ export function BookingDialog({ packages, cleaners, customers, initial, onClose,
                   ))}
                 </Select>
               </Field>
+              <Field label="Hours">
+                <Select
+                  value={String(hours)}
+                  onChange={(e) => {
+                    setHours(Number(e.target.value));
+                    setAmountTouched(false);
+                  }}
+                >
+                  {HOURS_OPTIONS.map((h) => (
+                    <option key={h} value={h}>
+                      {h}h
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
               <Field label="Cleaner">
                 <Select value={cleanerId} onChange={(e) => setCleanerId(e.target.value)}>
                   {activeCleaners.map((c) => (
@@ -220,10 +248,7 @@ export function BookingDialog({ packages, cleaners, customers, initial, onClose,
                   ))}
                 </Select>
               </Field>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Amount (SGD)">
+              <Field label={`Amount (SGD) · $${hourlyRate}/h`}>
                 <Input
                   type="number"
                   inputMode="decimal"
@@ -234,18 +259,19 @@ export function BookingDialog({ packages, cleaners, customers, initial, onClose,
                   }}
                 />
               </Field>
-              <div className="flex flex-col justify-end pb-1 text-xs text-muted-foreground">
-                {selectedPackage && (
-                  <span>
-                    Ends {formatTime12(endTime)} · {selectedPackage.durationHours}h ·{" "}
-                    {selectedPackage.cleanersRequired} cleaner(s)
-                  </span>
-                )}
-              </div>
+              <Field label="Payment">
+                <Select value={paymentStatus} onChange={(e) => setPaymentStatus(e.target.value as PaymentStatus)}>
+                  <option value="unbilled">Unbilled</option>
+                  <option value="pending">Pending</option>
+                  <option value="done">Paid</option>
+                </Select>
+              </Field>
             </div>
 
-            <Field label="Notes (optional)">
-              <Input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Gate code, pets, special requests…" />
+            <p className="text-xs text-muted-foreground">Ends {formatTime12(endTime)} · {hours} hours</p>
+
+            <Field label="Remark (optional)">
+              <Input value={remark} onChange={(e) => setRemark(e.target.value)} placeholder="Gate code, pets, special instructions…" />
             </Field>
 
             {error && (
@@ -271,9 +297,9 @@ export function BookingDialog({ packages, cleaners, customers, initial, onClose,
 
             {created && (
               <div className="rounded-lg border p-4 text-sm">
-                <div className="font-medium">{created.package.name}</div>
+                <div className="font-medium">{created.customer.name}</div>
                 <div className="text-muted-foreground">
-                  {created.customer.name} · {formatTime12(created.startTime)}–{formatTime12(created.endTime)} ·{" "}
+                  {formatTime12(created.startTime)}–{formatTime12(created.endTime)} ({created.hours}h) ·
                   Cleaner {created.cleaner.code}
                 </div>
                 <div className="mt-1 font-semibold">{formatSgd(created.amount)}</div>
@@ -284,7 +310,7 @@ export function BookingDialog({ packages, cleaners, customers, initial, onClose,
               <div className="flex items-center gap-2 border-b px-4 py-2 text-xs font-medium text-muted-foreground">
                 <Mail className="h-3.5 w-3.5" /> Confirmation email preview
               </div>
-              {emailPreview ? (
+              {hasEmail && emailPreview ? (
                 <div className="space-y-1 p-4 text-xs">
                   <div>
                     <span className="text-muted-foreground">To:</span> {emailPreview.to}
@@ -297,7 +323,9 @@ export function BookingDialog({ packages, cleaners, customers, initial, onClose,
                   </pre>
                 </div>
               ) : (
-                <div className="p-4 text-xs text-muted-foreground">Preparing preview…</div>
+                <div className="p-4 text-xs text-muted-foreground">
+                  No email on file for this customer — add one on the booking to send a confirmation.
+                </div>
               )}
             </div>
 
@@ -310,14 +338,14 @@ export function BookingDialog({ packages, cleaners, customers, initial, onClose,
                 <span className="text-xs text-muted-foreground">Send the confirmation to the customer.</span>
               )}
               <div className="flex gap-2">
-                {mailto && (
+                {hasEmail && mailto && (
                   <a href={mailto}>
                     <Button variant="outline" size="sm">
                       Open in mail app
                     </Button>
                   </a>
                 )}
-                <Button onClick={sendEmail} disabled={emailSending || emailSent} size="sm">
+                <Button onClick={sendEmail} disabled={!hasEmail || emailSending || emailSent} size="sm">
                   {emailSending && <Loader2 className="h-4 w-4 animate-spin" />}
                   {emailSent ? "Sent" : "Send confirmation"}
                 </Button>

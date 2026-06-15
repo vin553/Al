@@ -1,14 +1,14 @@
-// Revenue and utilisation analytics derived from bookings.
+// Revenue, payment, and utilisation analytics derived from bookings.
 
 import type { BookingDetail, Cleaner } from "./types";
 import { addDays, durationHours, today, weekdayOf, startOfWeek, formatDateShort } from "./dates";
 
 function billable(b: BookingDetail): boolean {
-  return b.status !== "cancelled";
+  return b.jobStatus !== "cancelled";
 }
 
 export function bookingHours(b: BookingDetail): number {
-  return durationHours(b.startTime, b.endTime);
+  return b.hours || durationHours(b.startTime, b.endTime);
 }
 
 /** Available working hours for a cleaner on a specific date (from weekly availability). */
@@ -25,6 +25,7 @@ export interface RangeStats {
   bookedHours: number;
   availableHours: number;
   utilisation: number; // 0..1
+  outstanding: number; // unpaid billable amount
 }
 
 export function statsForRange(
@@ -36,6 +37,9 @@ export function statsForRange(
   const inRange = bookings.filter((b) => b.date >= from && b.date <= to && billable(b));
   const revenue = inRange.reduce((s, b) => s + b.amount, 0);
   const bookedHours = inRange.reduce((s, b) => s + bookingHours(b), 0);
+  const outstanding = inRange
+    .filter((b) => b.paymentStatus !== "done")
+    .reduce((s, b) => s + b.amount, 0);
 
   let availableHours = 0;
   const active = cleaners.filter((c) => c.active);
@@ -49,6 +53,7 @@ export function statsForRange(
     bookedHours,
     availableHours,
     utilisation: availableHours > 0 ? bookedHours / availableHours : 0,
+    outstanding,
   };
 }
 
@@ -114,29 +119,33 @@ export function dailyRevenue(bookings: BookingDetail[], days = 14): DayPoint[] {
   return out;
 }
 
-/** Revenue and job count grouped by package. */
-export interface PackageMix {
-  packageId: string;
+/** Revenue and job count grouped by cleaner (for the dashboard pie). */
+export interface CleanerMix {
+  cleanerId: string;
   name: string;
   color: string;
   revenue: number;
   jobs: number;
 }
 
-export function packageMix(bookings: BookingDetail[], from: string, to: string): PackageMix[] {
-  const map = new Map<string, PackageMix>();
+export function revenueByCleaner(
+  bookings: BookingDetail[],
+  from: string,
+  to: string
+): CleanerMix[] {
+  const map = new Map<string, CleanerMix>();
   for (const b of bookings) {
     if (b.date < from || b.date > to || !billable(b)) continue;
-    const cur = map.get(b.packageId) ?? {
-      packageId: b.packageId,
-      name: b.package.name,
-      color: b.package.color,
+    const cur = map.get(b.cleanerId) ?? {
+      cleanerId: b.cleanerId,
+      name: b.cleaner.name,
+      color: b.cleaner.color,
       revenue: 0,
       jobs: 0,
     };
     cur.revenue += b.amount;
     cur.jobs += 1;
-    map.set(b.packageId, cur);
+    map.set(b.cleanerId, cur);
   }
   return Array.from(map.values()).sort((a, b) => b.revenue - a.revenue);
 }

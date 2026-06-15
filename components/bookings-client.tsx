@@ -1,52 +1,54 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { StatusBadge } from "@/components/status-badge";
+import { StatusBadge, PaymentBadge } from "@/components/status-badge";
 import { BookingDialog } from "@/components/booking-dialog";
 import { formatSgd } from "@/lib/utils";
 import { formatDateShort, formatTime12 } from "@/lib/dates";
-import type { BookingDetail, BookingStatus, Cleaner, Customer, Package } from "@/lib/types";
+import type { BookingDetail, Cleaner, Customer, JobStatus, PaymentStatus } from "@/lib/types";
 import { Mail, Plus } from "lucide-react";
 
 interface Props {
   bookings: BookingDetail[];
-  packages: Package[];
   cleaners: Cleaner[];
   customers: Customer[];
+  hourlyRate: number;
   openNew?: boolean;
 }
 
-export function BookingsClient({ bookings, packages, cleaners, customers, openNew }: Props) {
+export function BookingsClient({ bookings, cleaners, customers, hourlyRate, openNew }: Props) {
   const router = useRouter();
   const [dialogOpen, setDialogOpen] = useState(!!openNew);
   const [query, setQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | BookingStatus>("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | JobStatus>("all");
+  const [payFilter, setPayFilter] = useState<"all" | PaymentStatus>("all");
 
   const filtered = useMemo(() => {
     return bookings
-      .filter((b) => (statusFilter === "all" ? true : b.status === statusFilter))
+      .filter((b) => (statusFilter === "all" ? true : b.jobStatus === statusFilter))
+      .filter((b) => (payFilter === "all" ? true : b.paymentStatus === payFilter))
       .filter((b) => {
         if (!query.trim()) return true;
         const q = query.toLowerCase();
         return (
           b.customer.name.toLowerCase().includes(q) ||
-          b.package.name.toLowerCase().includes(q) ||
+          b.customer.code.toLowerCase().includes(q) ||
           b.cleaner.name.toLowerCase().includes(q) ||
           b.cleaner.code.toLowerCase() === q
         );
       })
       .sort((a, b) => (b.date + b.startTime).localeCompare(a.date + a.startTime));
-  }, [bookings, query, statusFilter]);
+  }, [bookings, query, statusFilter, payFilter]);
 
-  async function setStatus(id: string, status: BookingStatus) {
+  async function patch(id: string, body: Record<string, string>) {
     await fetch(`/api/bookings/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
+      body: JSON.stringify(body),
     });
     router.refresh();
   }
@@ -55,20 +57,22 @@ export function BookingsClient({ bookings, packages, cleaners, customers, openNe
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
         <Input
-          placeholder="Search customer, package, cleaner…"
+          placeholder="Search customer, code, cleaner…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="max-w-xs"
         />
-        <Select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
-          className="w-40"
-        >
-          <option value="all">All statuses</option>
-          <option value="confirmed">Confirmed</option>
+        <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)} className="w-36">
+          <option value="all">All jobs</option>
+          <option value="scheduled">Scheduled</option>
           <option value="completed">Completed</option>
           <option value="cancelled">Cancelled</option>
+        </Select>
+        <Select value={payFilter} onChange={(e) => setPayFilter(e.target.value as typeof payFilter)} className="w-36">
+          <option value="all">All payments</option>
+          <option value="done">Paid</option>
+          <option value="pending">Pending</option>
+          <option value="unbilled">Unbilled</option>
         </Select>
         <Button className="ml-auto" onClick={() => setDialogOpen(true)}>
           <Plus className="h-4 w-4" /> New booking
@@ -81,11 +85,11 @@ export function BookingsClient({ bookings, packages, cleaners, customers, openNe
             <tr>
               <th className="px-4 py-3 font-medium">Date / Time</th>
               <th className="px-4 py-3 font-medium">Customer</th>
-              <th className="px-4 py-3 font-medium">Package</th>
               <th className="px-4 py-3 font-medium">Cleaner</th>
+              <th className="px-4 py-3 text-right font-medium">Hrs</th>
               <th className="px-4 py-3 text-right font-medium">Amount</th>
-              <th className="px-4 py-3 font-medium">Status</th>
-              <th className="px-4 py-3 font-medium">Email</th>
+              <th className="px-4 py-3 font-medium">Job</th>
+              <th className="px-4 py-3 font-medium">Payment</th>
               <th className="px-4 py-3" />
             </tr>
           </thead>
@@ -99,50 +103,42 @@ export function BookingsClient({ bookings, packages, cleaners, customers, openNe
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  <div className="font-medium">{b.customer.name}</div>
-                  <div className="text-xs text-muted-foreground">{b.customer.email}</div>
+                  <div className="flex items-center gap-1.5 font-medium">
+                    <span className="h-2 w-2 rounded-full" style={{ background: b.cleaner.color }} />
+                    {b.customer.name}
+                    {b.emailSent && <Mail className="h-3 w-3 text-emerald-500" aria-label="Emailed" />}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{b.customer.code || b.customer.phone}</div>
                 </td>
-                <td className="px-4 py-3">
-                  <span
-                    className="mr-2 inline-block h-2 w-2 rounded-full align-middle"
-                    style={{ background: b.package.color }}
-                  />
-                  {b.package.name}
-                </td>
-                <td className="px-4 py-3">
-                  {b.cleaner.code} · {b.cleaner.name}
-                </td>
+                <td className="px-4 py-3">{b.cleaner.code}</td>
+                <td className="px-4 py-3 text-right tabular-nums">{b.hours}</td>
                 <td className="px-4 py-3 text-right font-medium tabular-nums">{formatSgd(b.amount)}</td>
                 <td className="px-4 py-3">
-                  <StatusBadge status={b.status} />
+                  <StatusBadge status={b.jobStatus} />
                 </td>
                 <td className="px-4 py-3">
-                  {b.emailSent ? (
-                    <span className="inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
-                      <Mail className="h-3.5 w-3.5" /> Sent
-                    </span>
-                  ) : (
-                    <span className="text-xs text-muted-foreground">—</span>
-                  )}
+                  <PaymentBadge status={b.paymentStatus} />
                 </td>
                 <td className="px-4 py-3 text-right">
-                  {b.status === "confirmed" && (
-                    <div className="flex justify-end gap-1">
-                      <Button size="sm" variant="ghost" onClick={() => setStatus(b.id, "completed")}>
+                  <div className="flex justify-end gap-1">
+                    {b.jobStatus === "scheduled" && (
+                      <Button size="sm" variant="ghost" onClick={() => patch(b.id, { jobStatus: "completed" })}>
                         Complete
                       </Button>
-                      <Button size="sm" variant="ghost" onClick={() => setStatus(b.id, "cancelled")}>
-                        Cancel
+                    )}
+                    {b.paymentStatus !== "done" && b.jobStatus !== "cancelled" && (
+                      <Button size="sm" variant="ghost" onClick={() => patch(b.id, { paymentStatus: "done" })}>
+                        Mark paid
                       </Button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
                 <td colSpan={8} className="px-4 py-10 text-center text-sm text-muted-foreground">
-                  No bookings match your filters.
+                  No jobs match your filters.
                 </td>
               </tr>
             )}
@@ -152,9 +148,9 @@ export function BookingsClient({ bookings, packages, cleaners, customers, openNe
 
       {dialogOpen && (
         <BookingDialog
-          packages={packages}
           cleaners={cleaners}
           customers={customers}
+          hourlyRate={hourlyRate}
           onClose={() => {
             setDialogOpen(false);
             router.refresh();

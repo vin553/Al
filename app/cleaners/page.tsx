@@ -22,7 +22,7 @@ export default function CleanersPage() {
       <PageHeader
         eyebrow="Team"
         title="Cleaners"
-        description="The cleaning team (placeholder names A–J). Each card shows weekly availability plus this week's utilisation and revenue. Names, phone numbers, and schedules can be swapped for the real roster."
+        description="The cleaning team. Each card shows weekly availability plus this week's utilisation and revenue. Phone numbers and exact working schedules can be filled in once confirmed."
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -34,7 +34,10 @@ export default function CleanersPage() {
               <CardContent className="space-y-3 p-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-base font-semibold text-primary-foreground">
+                    <span
+                      className="flex h-10 w-10 items-center justify-center rounded-lg text-sm font-semibold text-white"
+                      style={{ background: c.color }}
+                    >
                       {c.code}
                     </span>
                     <div>

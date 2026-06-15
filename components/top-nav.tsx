@@ -10,9 +10,9 @@ import { COMPANY } from "@/lib/seed-data";
 const links = [
   { href: "/", label: "Dashboard" },
   { href: "/calendar", label: "Calendar" },
-  { href: "/bookings", label: "Bookings" },
+  { href: "/bookings", label: "Jobs" },
   { href: "/cleaners", label: "Cleaners" },
-  { href: "/packages", label: "Packages" },
+  { href: "/customers", label: "Customers" },
 ];
 
 export function TopNav() {
