@@ -47,6 +47,15 @@ pnpm dev          # http://localhost:3000
 Other scripts: `pnpm build` / `pnpm start` (production), `pnpm typecheck`.
 To reset the data, delete `data/cleaning.db*` and restart — it reseeds.
 
+## Deploy a shareable link
+
+The repo includes a `render.yaml` blueprint for a near one-click deploy to
+[Render](https://render.com) (free tier). See **[DEPLOY.md](DEPLOY.md)** for the
+step-by-step. In short: Render → New + → Blueprint → connect `vin553/Al` → Apply,
+and you get a public URL in a few minutes.
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/vin553/Al/tree/claude/magical-pasteur-d84lsc)
+
 ## Customising for the client
 
 - **Cleaners** — names, phone numbers, and weekly availability are in
