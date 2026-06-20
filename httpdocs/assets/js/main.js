@@ -230,6 +230,58 @@
   }
 
   /* ------------------------------------------------------------------ */
+  /* Gallery lightbox                                                   */
+  /* ------------------------------------------------------------------ */
+  function initLightbox() {
+    var items = document.querySelectorAll("[data-lightbox]");
+    if (!items.length) return;
+
+    var box = document.createElement("div");
+    box.className = "lightbox";
+    box.setAttribute("role", "dialog");
+    box.setAttribute("aria-modal", "true");
+    box.setAttribute("aria-label", "Image viewer");
+    box.innerHTML =
+      '<button class="lightbox__close" aria-label="Close image viewer">&times;</button>' +
+      '<img class="lightbox__img" alt="" />';
+    document.body.appendChild(box);
+
+    var img = box.querySelector(".lightbox__img");
+    var closeBtn = box.querySelector(".lightbox__close");
+    var lastFocus = null;
+
+    function open(src, alt) {
+      img.src = src;
+      img.alt = alt || "";
+      box.classList.add("is-open");
+      document.body.style.overflow = "hidden";
+      lastFocus = document.activeElement;
+      closeBtn.focus();
+    }
+    function close() {
+      box.classList.remove("is-open");
+      document.body.style.overflow = "";
+      img.src = "";
+      if (lastFocus) lastFocus.focus();
+    }
+
+    items.forEach(function (el) {
+      el.addEventListener("click", function () {
+        var src = el.getAttribute("data-lightbox");
+        var alt = el.getAttribute("data-alt") || "";
+        if (src) open(src, alt);
+      });
+    });
+    closeBtn.addEventListener("click", close);
+    box.addEventListener("click", function (e) {
+      if (e.target === box) close();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && box.classList.contains("is-open")) close();
+    });
+  }
+
+  /* ------------------------------------------------------------------ */
   /* Footer year                                                        */
   /* ------------------------------------------------------------------ */
   function initYear() {
@@ -244,6 +296,7 @@
     initReveal();
     initParallax();
     initIncense();
+    initLightbox();
     initYear();
   }
 
