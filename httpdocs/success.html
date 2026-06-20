@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Thank You — Sri Veeramakaliamman Temple</title>
+  <meta name="description" content="Thank you for your donation to Sri Veeramakaliamman Temple." />
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Catamaran:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header site-header--solid">
+    <div class="wrap site-header__inner">
+      <a class="brand" href="index.html" aria-label="Sri Veeramakaliamman Temple — home">
+        <span class="brand__mark" aria-hidden="true">&#2384;</span>
+        <span class="brand__text">
+          <span class="brand__name">Sri Veeramakaliamman</span>
+          <span class="brand__tamil tamil">ஸ்ரீ வீரமாகாளியம்மன் கோவில்</span>
+        </span>
+      </a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu"><span class="nav-toggle__bar" aria-hidden="true"></span></button>
+      <nav class="nav" id="primary-nav" aria-label="Primary">
+        <ul class="nav__list">
+          <li><a class="nav__link" href="index.html">Home</a></li>
+          <li><a class="nav__link" href="history.html">History</a></li>
+          <li><a class="nav__link" href="deities.html">Deities</a></li>
+          <li><a class="nav__link" href="events.html">Events</a></li>
+          <li><a class="nav__link" href="gallery.html">Gallery</a></li>
+          <li><a class="nav__link" href="contact.html">Contact</a></li>
+        </ul>
+        <a class="btn nav__cta" href="donate.html">Donate</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="section section--deep" style="min-height:72vh;display:grid;place-items:center;">
+      <div class="wrap wrap--narrow center-text flow">
+        <div class="donate-card__icon" style="margin-inline:auto;width:72px;height:72px;font-size:2.2rem;color:var(--gold);border-color:var(--gold);" aria-hidden="true">&#2384;</div>
+        <p class="eyebrow">Nandri · Thank You</p>
+        <h1 class="shimmer" style="display:inline-block;">Your offering is received</h1>
+        <p class="lede measure" style="margin-inline:auto;">
+          May the Divine Mother bless you and your family with health, courage, and peace.
+          A receipt has been emailed to you by Stripe.
+        </p>
+        <p class="form-status" id="ref" aria-live="polite"></p>
+        <div class="hero__cta-row" style="margin-top:var(--space-md);">
+          <a class="btn" href="index.html">Return Home</a>
+          <a class="btn btn--ghost" href="events.html">View Upcoming Events</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-bottom" style="border-top:0;margin-top:0;">
+        <span>&copy; <span data-year>2026</span> Sri Veeramakaliamman Temple.</span>
+        <span>Om Shakti &#2384;</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js" defer></script>
+  <script>
+    // Show a short, non-sensitive reference from the Stripe session id, if present.
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var sid = params.get("session_id");
+      var el = document.getElementById("ref");
+      if (sid && el) {
+        var ref = sid.slice(-8).toUpperCase();
+        el.textContent = "Reference: " + ref;
+      }
+    })();
+  </script>
+</body>
+</html>

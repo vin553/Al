@@ -17,3 +17,6 @@ data/*.db-shm
 data/*.db-wal
 data/swot-cache
 tsconfig.tsbuildinfo
+
+# Temple site — never commit real Stripe keys
+httpdocs/stripe-config.php

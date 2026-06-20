@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Donate — Sri Veeramakaliamman Temple</title>
+  <meta name="description" content="Support Sri Veeramakaliamman Temple with a secure online donation — temple fund, Annadhanam meals, abishekam sponsorship, and festival causes. Powered by Stripe." />
+  <link rel="canonical" href="https://srivkt.org/donate.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Donate — Sri Veeramakaliamman Temple" />
+  <meta property="og:description" content="Give securely to daily worship, free meals, and festivals. Stripe-secured." />
+  <meta property="og:url" content="https://srivkt.org/donate.html" />
+  <meta property="og:image" content="https://srivkt.org/assets/img/og-home.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Catamaran:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header site-header--solid">
+    <div class="wrap site-header__inner">
+      <a class="brand" href="index.html" aria-label="Sri Veeramakaliamman Temple — home">
+        <span class="brand__mark" aria-hidden="true">&#2384;</span>
+        <span class="brand__text">
+          <span class="brand__name">Sri Veeramakaliamman</span>
+          <span class="brand__tamil tamil">ஸ்ரீ வீரமாகாளியம்மன் கோவில்</span>
+        </span>
+      </a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+        <span class="nav-toggle__bar" aria-hidden="true"></span>
+      </button>
+      <nav class="nav" id="primary-nav" aria-label="Primary">
+        <ul class="nav__list">
+          <li><a class="nav__link" href="index.html">Home</a></li>
+          <li><a class="nav__link" href="history.html">History</a></li>
+          <li><a class="nav__link" href="deities.html">Deities</a></li>
+          <li><a class="nav__link" href="events.html">Events</a></li>
+          <li><a class="nav__link" href="gallery.html">Gallery</a></li>
+          <li><a class="nav__link" href="contact.html">Contact</a></li>
+        </ul>
+        <a class="btn nav__cta" href="donate.html" aria-current="page">Donate</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <header class="page-hero">
+      <div class="wrap">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+          <a href="index.html">Home</a><span aria-hidden="true">/</span>Donate
+        </nav>
+        <h1 class="page-hero__title">Make an Offering</h1>
+        <p class="lede">Sustain daily worship, free meals, and the festivals of the Mother. Every gift is received with gratitude.</p>
+      </div>
+    </header>
+
+    <section class="section section--ivory">
+      <div class="wrap">
+
+        <div class="donate-secure reveal" style="justify-content:center;margin-bottom:var(--space-lg);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span>Secure checkout by <strong>Stripe</strong>. The temple never sees your card details. A receipt is emailed automatically.</span>
+        </div>
+
+        <div class="grid donate-grid">
+
+          <!-- General -->
+          <form class="donate-card reveal" id="general" data-donate-card data-event="general" novalidate>
+            <div class="donate-card__icon" aria-hidden="true">&#2384;</div>
+            <h2 class="donate-card__title">Temple Fund</h2>
+            <p class="donate-card__meaning">General giving — supports daily worship and the upkeep of the temple.</p>
+            <ul class="tiers" role="group" aria-label="Suggested amounts">
+              <li><button type="button" class="tier-btn" data-amount="28" aria-pressed="false">S$28</button></li>
+              <li><button type="button" class="tier-btn" data-amount="51" aria-pressed="false">S$51</button></li>
+              <li><button type="button" class="tier-btn" data-amount="108" aria-pressed="false">S$108</button></li>
+              <li><button type="button" class="tier-btn" data-amount="251" aria-pressed="false">S$251</button></li>
+            </ul>
+            <div class="field field--amount">
+              <label for="amt-general">Amount (SGD)</label>
+              <span class="prefix" aria-hidden="true">S$</span>
+              <input id="amt-general" data-role="amount" type="number" inputmode="numeric" min="1" step="1" placeholder="Enter amount" />
+            </div>
+            <div class="field__row">
+              <div class="field"><label for="name-general">Name <span style="font-weight:400">(optional)</span></label><input id="name-general" data-role="name" type="text" autocomplete="name" /></div>
+              <div class="field"><label for="email-general">Email <span style="font-weight:400">(optional)</span></label><input id="email-general" data-role="email" type="email" autocomplete="email" /></div>
+            </div>
+            <p class="form-error" data-role="error" role="alert" aria-live="assertive"></p>
+            <p class="form-status" data-role="status" aria-live="polite"></p>
+            <button type="button" class="btn btn--block btn--donate" data-role="submit">Donate</button>
+          </form>
+
+          <!-- Annadhanam -->
+          <form class="donate-card reveal reveal--delay-1" id="annadhanam" data-donate-card data-event="annadhanam" novalidate>
+            <div class="donate-card__icon" aria-hidden="true">&#2384;</div>
+            <h2 class="donate-card__title">Annadhanam</h2>
+            <p class="donate-card__meaning">Sponsor free vegetarian meals — feeding devotees is among the highest forms of seva.</p>
+            <ul class="tiers" role="group" aria-label="Suggested amounts">
+              <li><button type="button" class="tier-btn" data-amount="28" aria-pressed="false">S$28</button></li>
+              <li><button type="button" class="tier-btn" data-amount="51" aria-pressed="false">S$51</button></li>
+              <li><button type="button" class="tier-btn" data-amount="108" aria-pressed="false">S$108</button></li>
+              <li><button type="button" class="tier-btn" data-amount="251" aria-pressed="false">S$251</button></li>
+            </ul>
+            <div class="field field--amount">
+              <label for="amt-annadhanam">Amount (SGD)</label>
+              <span class="prefix" aria-hidden="true">S$</span>
+              <input id="amt-annadhanam" data-role="amount" type="number" inputmode="numeric" min="1" step="1" placeholder="Enter amount" />
+            </div>
+            <div class="field__row">
+              <div class="field"><label for="name-annadhanam">Name <span style="font-weight:400">(optional)</span></label><input id="name-annadhanam" data-role="name" type="text" autocomplete="name" /></div>
+              <div class="field"><label for="email-annadhanam">Email <span style="font-weight:400">(optional)</span></label><input id="email-annadhanam" data-role="email" type="email" autocomplete="email" /></div>
+            </div>
+            <p class="form-error" data-role="error" role="alert" aria-live="assertive"></p>
+            <p class="form-status" data-role="status" aria-live="polite"></p>
+            <button type="button" class="btn btn--block btn--donate" data-role="submit">Donate</button>
+          </form>
+
+          <!-- Abishekam -->
+          <form class="donate-card reveal reveal--delay-2" id="abishekam" data-donate-card data-event="abishekam" novalidate>
+            <div class="donate-card__icon" aria-hidden="true">&#2384;</div>
+            <h2 class="donate-card__title">Abishekam / Archanai</h2>
+            <p class="donate-card__meaning">Sponsor a sacred bathing of the deity or an archanai offered in your family's name.</p>
+            <ul class="tiers" role="group" aria-label="Suggested amounts">
+              <li><button type="button" class="tier-btn" data-amount="28" aria-pressed="false">S$28</button></li>
+              <li><button type="button" class="tier-btn" data-amount="51" aria-pressed="false">S$51</button></li>
+              <li><button type="button" class="tier-btn" data-amount="108" aria-pressed="false">S$108</button></li>
+              <li><button type="button" class="tier-btn" data-amount="251" aria-pressed="false">S$251</button></li>
+            </ul>
+            <div class="field field--amount">
+              <label for="amt-abishekam">Amount (SGD)</label>
+              <span class="prefix" aria-hidden="true">S$</span>
+              <input id="amt-abishekam" data-role="amount" type="number" inputmode="numeric" min="1" step="1" placeholder="Enter amount" />
+            </div>
+            <div class="field__row">
+              <div class="field"><label for="name-abishekam">Name <span style="font-weight:400">(optional)</span></label><input id="name-abishekam" data-role="name" type="text" autocomplete="name" /></div>
+              <div class="field"><label for="email-abishekam">Email <span style="font-weight:400">(optional)</span></label><input id="email-abishekam" data-role="email" type="email" autocomplete="email" /></div>
+            </div>
+            <p class="form-error" data-role="error" role="alert" aria-live="assertive"></p>
+            <p class="form-status" data-role="status" aria-live="polite"></p>
+            <button type="button" class="btn btn--block btn--donate" data-role="submit">Donate</button>
+          </form>
+
+          <!-- Aadi -->
+          <form class="donate-card reveal" id="aadi" data-donate-card data-event="aadi" novalidate>
+            <div class="donate-card__icon" aria-hidden="true">&#2384;</div>
+            <h2 class="donate-card__title">Aadi Thiruvizha</h2>
+            <p class="donate-card__meaning">Support the Mother's high festival in the Tamil month of Aadi.</p>
+            <ul class="tiers" role="group" aria-label="Suggested amounts">
+              <li><button type="button" class="tier-btn" data-amount="51" aria-pressed="false">S$51</button></li>
+              <li><button type="button" class="tier-btn" data-amount="108" aria-pressed="false">S$108</button></li>
+              <li><button type="button" class="tier-btn" data-amount="251" aria-pressed="false">S$251</button></li>
+              <li><button type="button" class="tier-btn" data-amount="501" aria-pressed="false">S$501</button></li>
+            </ul>
+            <div class="field field--amount">
+              <label for="amt-aadi">Amount (SGD)</label>
+              <span class="prefix" aria-hidden="true">S$</span>
+              <input id="amt-aadi" data-role="amount" type="number" inputmode="numeric" min="1" step="1" placeholder="Enter amount" />
+            </div>
+            <div class="field__row">
+              <div class="field"><label for="name-aadi">Name <span style="font-weight:400">(optional)</span></label><input id="name-aadi" data-role="name" type="text" autocomplete="name" /></div>
+              <div class="field"><label for="email-aadi">Email <span style="font-weight:400">(optional)</span></label><input id="email-aadi" data-role="email" type="email" autocomplete="email" /></div>
+            </div>
+            <p class="form-error" data-role="error" role="alert" aria-live="assertive"></p>
+            <p class="form-status" data-role="status" aria-live="polite"></p>
+            <button type="button" class="btn btn--block btn--donate" data-role="submit">Donate</button>
+          </form>
+
+          <!-- Navaratri -->
+          <form class="donate-card reveal reveal--delay-1" id="navaratri" data-donate-card data-event="navaratri" novalidate>
+            <div class="donate-card__icon" aria-hidden="true">&#2384;</div>
+            <h2 class="donate-card__title">Navaratri Kolu</h2>
+            <p class="donate-card__meaning">Support nine nights of worship and the traditional Kolu display.</p>
+            <ul class="tiers" role="group" aria-label="Suggested amounts">
+              <li><button type="button" class="tier-btn" data-amount="51" aria-pressed="false">S$51</button></li>
+              <li><button type="button" class="tier-btn" data-amount="108" aria-pressed="false">S$108</button></li>
+              <li><button type="button" class="tier-btn" data-amount="251" aria-pressed="false">S$251</button></li>
+              <li><button type="button" class="tier-btn" data-amount="501" aria-pressed="false">S$501</button></li>
+            </ul>
+            <div class="field field--amount">
+              <label for="amt-navaratri">Amount (SGD)</label>
+              <span class="prefix" aria-hidden="true">S$</span>
+              <input id="amt-navaratri" data-role="amount" type="number" inputmode="numeric" min="1" step="1" placeholder="Enter amount" />
+            </div>
+            <div class="field__row">
+              <div class="field"><label for="name-navaratri">Name <span style="font-weight:400">(optional)</span></label><input id="name-navaratri" data-role="name" type="text" autocomplete="name" /></div>
+              <div class="field"><label for="email-navaratri">Email <span style="font-weight:400">(optional)</span></label><input id="email-navaratri" data-role="email" type="email" autocomplete="email" /></div>
+            </div>
+            <p class="form-error" data-role="error" role="alert" aria-live="assertive"></p>
+            <p class="form-status" data-role="status" aria-live="polite"></p>
+            <button type="button" class="btn btn--block btn--donate" data-role="submit">Donate</button>
+          </form>
+
+          <!-- Deepavali -->
+          <form class="donate-card reveal reveal--delay-2" id="deepavali" data-donate-card data-event="deepavali" novalidate>
+            <div class="donate-card__icon" aria-hidden="true">&#2384;</div>
+            <h2 class="donate-card__title">Deepavali Chariot (Ther)</h2>
+            <p class="donate-card__meaning">Help carry the deity through Little India on the silver chariot.</p>
+            <ul class="tiers" role="group" aria-label="Suggested amounts">
+              <li><button type="button" class="tier-btn" data-amount="51" aria-pressed="false">S$51</button></li>
+              <li><button type="button" class="tier-btn" data-amount="108" aria-pressed="false">S$108</button></li>
+              <li><button type="button" class="tier-btn" data-amount="251" aria-pressed="false">S$251</button></li>
+              <li><button type="button" class="tier-btn" data-amount="501" aria-pressed="false">S$501</button></li>
+            </ul>
+            <div class="field field--amount">
+              <label for="amt-deepavali">Amount (SGD)</label>
+              <span class="prefix" aria-hidden="true">S$</span>
+              <input id="amt-deepavali" data-role="amount" type="number" inputmode="numeric" min="1" step="1" placeholder="Enter amount" />
+            </div>
+            <div class="field__row">
+              <div class="field"><label for="name-deepavali">Name <span style="font-weight:400">(optional)</span></label><input id="name-deepavali" data-role="name" type="text" autocomplete="name" /></div>
+              <div class="field"><label for="email-deepavali">Email <span style="font-weight:400">(optional)</span></label><input id="email-deepavali" data-role="email" type="email" autocomplete="email" /></div>
+            </div>
+            <p class="form-error" data-role="error" role="alert" aria-live="assertive"></p>
+            <p class="form-status" data-role="status" aria-live="polite"></p>
+            <button type="button" class="btn btn--block btn--donate" data-role="submit">Donate</button>
+          </form>
+
+          <!-- Thaipusam -->
+          <form class="donate-card reveal" id="thaipusam" data-donate-card data-event="thaipusam" novalidate>
+            <div class="donate-card__icon" aria-hidden="true">&#2384;</div>
+            <h2 class="donate-card__title">Thaipusam</h2>
+            <p class="donate-card__meaning">Support the vows, kavadi, and observances of Thaipusam.</p>
+            <ul class="tiers" role="group" aria-label="Suggested amounts">
+              <li><button type="button" class="tier-btn" data-amount="51" aria-pressed="false">S$51</button></li>
+              <li><button type="button" class="tier-btn" data-amount="108" aria-pressed="false">S$108</button></li>
+              <li><button type="button" class="tier-btn" data-amount="251" aria-pressed="false">S$251</button></li>
+              <li><button type="button" class="tier-btn" data-amount="501" aria-pressed="false">S$501</button></li>
+            </ul>
+            <div class="field field--amount">
+              <label for="amt-thaipusam">Amount (SGD)</label>
+              <span class="prefix" aria-hidden="true">S$</span>
+              <input id="amt-thaipusam" data-role="amount" type="number" inputmode="numeric" min="1" step="1" placeholder="Enter amount" />
+            </div>
+            <div class="field__row">
+              <div class="field"><label for="name-thaipusam">Name <span style="font-weight:400">(optional)</span></label><input id="name-thaipusam" data-role="name" type="text" autocomplete="name" /></div>
+              <div class="field"><label for="email-thaipusam">Email <span style="font-weight:400">(optional)</span></label><input id="email-thaipusam" data-role="email" type="email" autocomplete="email" /></div>
+            </div>
+            <p class="form-error" data-role="error" role="alert" aria-live="assertive"></p>
+            <p class="form-status" data-role="status" aria-live="polite"></p>
+            <button type="button" class="btn btn--block btn--donate" data-role="submit">Donate</button>
+          </form>
+
+          <!-- Renovation / Kumbhabishekam -->
+          <form class="donate-card reveal reveal--delay-1" id="renovation" data-donate-card data-event="renovation" novalidate>
+            <div class="donate-card__icon" aria-hidden="true">&#2384;</div>
+            <h2 class="donate-card__title">Kumbhabishekam / Building Fund</h2>
+            <p class="donate-card__meaning">Contribute to the periodic re-consecration and conservation of this national monument.</p>
+            <ul class="tiers" role="group" aria-label="Suggested amounts">
+              <li><button type="button" class="tier-btn" data-amount="108" aria-pressed="false">S$108</button></li>
+              <li><button type="button" class="tier-btn" data-amount="251" aria-pressed="false">S$251</button></li>
+              <li><button type="button" class="tier-btn" data-amount="501" aria-pressed="false">S$501</button></li>
+              <li><button type="button" class="tier-btn" data-amount="1008" aria-pressed="false">S$1,008</button></li>
+            </ul>
+            <div class="field field--amount">
+              <label for="amt-renovation">Amount (SGD)</label>
+              <span class="prefix" aria-hidden="true">S$</span>
+              <input id="amt-renovation" data-role="amount" type="number" inputmode="numeric" min="1" step="1" placeholder="Enter amount" />
+            </div>
+            <div class="field__row">
+              <div class="field"><label for="name-renovation">Name <span style="font-weight:400">(optional)</span></label><input id="name-renovation" data-role="name" type="text" autocomplete="name" /></div>
+              <div class="field"><label for="email-renovation">Email <span style="font-weight:400">(optional)</span></label><input id="email-renovation" data-role="email" type="email" autocomplete="email" /></div>
+            </div>
+            <p class="form-error" data-role="error" role="alert" aria-live="assertive"></p>
+            <p class="form-status" data-role="status" aria-live="polite"></p>
+            <button type="button" class="btn btn--block btn--donate" data-role="submit">Donate</button>
+          </form>
+
+        </div>
+
+        <p class="note reveal" style="margin-top:var(--space-lg);max-width:70ch;">
+          Suggested amounts follow auspicious figures and are only a guide — give any whole-dollar
+          amount you wish. Donations are processed in Singapore Dollars (SGD).
+          <span class="todo-flag">TODO: confirm whether donations are tax-deductible (IPC status) and add the temple's UEN / receipt wording.</span>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-brand__name">Sri Veeramakaliamman</div>
+          <div class="footer-brand__tamil tamil">ஸ்ரீ வீரமாகாளியம்மன் கோவில்</div>
+          <p style="margin-top:1rem;max-width:34ch;">141 Serangoon Road, Singapore 218042. A conserved Dravidian temple to Kali the Courageous, serving Little India since 1881.</p>
+        </div>
+        <div class="footer-col"><h4>Explore</h4><ul>
+          <li><a href="history.html">History</a></li>
+          <li><a href="deities.html">Deities</a></li>
+          <li><a href="events.html">Events &amp; Poojas</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+        </ul></div>
+        <div class="footer-col"><h4>Participate</h4><ul>
+          <li><a href="donate.html">Donate</a></li>
+          <li><a href="donate.html#annadhanam">Sponsor Annadhanam</a></li>
+          <li><a href="donate.html#abishekam">Sponsor Abishekam</a></li>
+          <li><a href="contact.html">Contact &amp; Visit</a></li>
+        </ul></div>
+        <div class="footer-col"><h4>Connect</h4><ul>
+          <li><a href="https://www.facebook.com/SriVeeramakaliammanTemple/" rel="noopener">Facebook</a></li>
+          <li><a href="tel:+6562954538">6295 4538</a> <span class="todo-flag">verify</span></li>
+          <li><span>Email: <span class="todo-flag">TODO: confirm</span></span></li>
+        </ul></div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; <span data-year>2026</span> Sri Veeramakaliamman Temple. All rights reserved.</span>
+        <span>Om Shakti &#2384;</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js" defer></script>
+  <script src="assets/js/donate.js" defer></script>
+</body>
+</html>

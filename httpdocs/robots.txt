@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /create-checkout-session.php
+Disallow: /stripe-config.php
+Disallow: /success.html
+Disallow: /cancelled.html
+
+# TODO: confirm final domain before publishing
+Sitemap: https://srivkt.org/sitemap.xml
