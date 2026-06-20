@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 900" preserveAspectRatio="xMidYMax meet" role="img" aria-label="Stylised silhouette of the rajagopuram temple tower">
+  <!--
+    PLACEHOLDER rajagopuram silhouette. Replace with a transparent-background
+    PNG photo of the temple's 18-metre tower (see ASSETS-NEEDED.md).
+    Drawn in temple gold so it reads against the dark hero gradient.
+  -->
+  <defs>
+    <linearGradient id="towerGold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#C9A227"/>
+      <stop offset="1" stop-color="#B08D3F"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#towerGold)" opacity="0.92">
+    <!-- Base plinth -->
+    <rect x="180" y="820" width="440" height="80"/>
+    <!-- Stacked tiers, narrowing upward -->
+    <polygon points="200,820 600,820 560,720 240,720"/>
+    <polygon points="240,720 560,720 525,628 275,628"/>
+    <polygon points="275,628 525,628 492,544 308,544"/>
+    <polygon points="308,544 492,544 462,468 338,468"/>
+    <polygon points="338,468 462,468 436,400 364,400"/>
+    <polygon points="364,400 436,400 414,342 386,342"/>
+    <!-- Kalasam finials -->
+    <rect x="392" y="300" width="16" height="44"/>
+    <circle cx="400" cy="292" r="14"/>
+    <circle cx="400" cy="266" r="8"/>
+  </g>
+  <!-- Tier hairlines -->
+  <g stroke="#4A0E12" stroke-width="3" opacity="0.5">
+    <line x1="240" y1="720" x2="560" y2="720"/>
+    <line x1="275" y1="628" x2="525" y2="628"/>
+    <line x1="308" y1="544" x2="492" y2="544"/>
+    <line x1="338" y1="468" x2="462" y2="468"/>
+    <line x1="364" y1="400" x2="436" y2="400"/>
+  </g>
+</svg>
