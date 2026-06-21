@@ -37,7 +37,7 @@ export default function DashboardPage() {
   return (
     <div className="container space-y-8 py-8">
       <PageHeader
-        eyebrow="Mei Myanmar Cleaning Services"
+        eyebrow="May Myanmar Cleaning Services"
         title="Operations dashboard"
         description="Live revenue, payments, and cleaner utilisation — built from the May & June job schedule."
       />

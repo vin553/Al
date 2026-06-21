@@ -2,7 +2,7 @@
   "name": "meimyanmar-bookings",
   "version": "0.1.0",
   "private": true,
-  "description": "Mei Myanmar Cleaning Services — booking calendar, scheduling, and revenue/utilisation console",
+  "description": "May Myanmar Cleaning Services — booking calendar, scheduling, and revenue/utilisation console",
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",

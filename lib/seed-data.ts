@@ -1,4 +1,4 @@
-// Roster + company config for Mei Myanmar Cleaning Services.
+// Roster + company config for May Myanmar Cleaning Services.
 // Customers and jobs are imported from data/jobs.seed.json (built from the
 // agency's May & June schedule spreadsheets).
 
@@ -23,9 +23,9 @@ export const SEED_CLEANERS: Cleaner[] = [
 
 /** Company / business configuration used across the app and in emails. */
 export const COMPANY = {
-  name: "Mei Myanmar Cleaning Services",
-  shortName: "Mei Myanmar",
-  email: "bookings@meimyanmar.sg",
+  name: "May Myanmar Cleaning Services",
+  shortName: "May Myanmar",
+  email: "bookings@maymyanmar.sg",
   phone: "+65 6100 2000",
   currency: "SGD",
   // Default hourly rate used to price jobs (staff can override per booking).

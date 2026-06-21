@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "sw
 export const metadata: Metadata = {
   title: `${COMPANY.name} — Booking & Operations`,
   description:
-    "Booking calendar, scheduling, revenue and cleaner utilisation for Mei Myanmar Cleaning Services.",
+    "Booking calendar, scheduling, revenue and cleaner utilisation for May Myanmar Cleaning Services.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

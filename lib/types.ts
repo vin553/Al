@@ -1,4 +1,4 @@
-// Domain types for Mei Myanmar Cleaning Services booking platform.
+// Domain types for May Myanmar Cleaning Services booking platform.
 // Modelled on the agency's real job register: hourly jobs with an assigned
 // cleaner, job status, and payment status.
 

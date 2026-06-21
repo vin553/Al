@@ -1,4 +1,4 @@
-# Mei Myanmar Cleaning Services — Booking & Operations Console
+# May Myanmar Cleaning Services — Booking & Operations Console
 
 An internal web app for a part-time cleaning agency. Service staff book jobs on a
 calendar, set the hours and amount, assign a cleaner, and email the customer a

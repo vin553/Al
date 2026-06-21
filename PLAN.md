@@ -1,4 +1,4 @@
-# Mei Myanmar Cleaning Services — Build Plan
+# May Myanmar Cleaning Services — Build Plan
 
 ## Goal
 A presentable internal app for a part-time cleaning agency: staff book hourly jobs
