@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { createBooking, findConflict, listBookingDetails } from "@/lib/db";
+import { createBooking, findConflict, listBookingDetails, setGoogleEventId } from "@/lib/db";
 import { addHoursToTime } from "@/lib/dates";
+import { createCalendarEvent, getConnection } from "@/lib/google";
 import type { NewBookingInput } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -42,5 +43,20 @@ export async function POST(req: Request) {
   }
 
   const booking = createBooking(body);
+
+  // Best-effort push to Google Calendar (only if an account is connected).
+  // Never block or fail the booking on a calendar hiccup.
+  try {
+    if (getConnection().connected) {
+      const eventId = await createCalendarEvent(booking);
+      if (eventId) {
+        setGoogleEventId(booking.id, eventId);
+        booking.googleEventId = eventId;
+      }
+    }
+  } catch (e) {
+    console.error("Google Calendar sync (create) failed:", e);
+  }
+
   return NextResponse.json({ booking }, { status: 201 });
 }

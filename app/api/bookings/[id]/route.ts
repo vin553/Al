@@ -5,6 +5,7 @@ import {
   updateJobStatus,
   updatePaymentStatus,
 } from "@/lib/db";
+import { deleteCalendarEvent } from "@/lib/google";
 import type { JobStatus, PaymentStatus } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -37,8 +38,17 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 }
 
 export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
-  if (!getBookingDetail(params.id)) {
+  const existing = getBookingDetail(params.id);
+  if (!existing) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+  // Remove the matching Google Calendar event too, if one was synced.
+  if (existing.googleEventId) {
+    try {
+      await deleteCalendarEvent(existing.googleEventId);
+    } catch (e) {
+      console.error("Google Calendar sync (delete) failed:", e);
+    }
   }
   deleteBooking(params.id);
   return NextResponse.json({ ok: true });

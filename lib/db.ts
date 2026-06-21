@@ -46,13 +46,18 @@ export function getDb(): Database.Database {
       remark TEXT NOT NULL DEFAULT '',
       email_sent INTEGER NOT NULL DEFAULT 0,
       whatsapp_sent INTEGER NOT NULL DEFAULT 0,
+      google_event_id TEXT,
       created_at TEXT NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
   `);
-  // Migration for databases created before whatsapp_sent existed.
+  // Migrations for databases created before newer columns existed.
   const cols = _db.prepare("PRAGMA table_info(bookings)").all() as { name: string }[];
   if (!cols.some((c) => c.name === "whatsapp_sent")) {
     _db.exec("ALTER TABLE bookings ADD COLUMN whatsapp_sent INTEGER NOT NULL DEFAULT 0");
+  }
+  if (!cols.some((c) => c.name === "google_event_id")) {
+    _db.exec("ALTER TABLE bookings ADD COLUMN google_event_id TEXT");
   }
   ensureSeeded(_db);
   return _db;
@@ -85,9 +90,14 @@ function ensureSeeded(db: Database.Database) {
 function insertBookingRow(db: Database.Database, b: Booking) {
   db.prepare(
     `INSERT INTO bookings
-      (id, customer_id, cleaner_id, date, start_time, end_time, hours, amount, job_status, payment_status, remark, email_sent, whatsapp_sent, created_at)
-     VALUES (@id, @customerId, @cleanerId, @date, @startTime, @endTime, @hours, @amount, @jobStatus, @paymentStatus, @remark, @emailSent, @whatsappSent, @createdAt)`
-  ).run({ ...b, emailSent: b.emailSent ? 1 : 0, whatsappSent: b.whatsappSent ? 1 : 0 });
+      (id, customer_id, cleaner_id, date, start_time, end_time, hours, amount, job_status, payment_status, remark, email_sent, whatsapp_sent, google_event_id, created_at)
+     VALUES (@id, @customerId, @cleanerId, @date, @startTime, @endTime, @hours, @amount, @jobStatus, @paymentStatus, @remark, @emailSent, @whatsappSent, @googleEventId, @createdAt)`
+  ).run({
+    ...b,
+    emailSent: b.emailSent ? 1 : 0,
+    whatsappSent: b.whatsappSent ? 1 : 0,
+    googleEventId: b.googleEventId ?? null,
+  });
 }
 
 interface BookingRow {
@@ -104,6 +114,7 @@ interface BookingRow {
   remark: string;
   email_sent: number;
   whatsapp_sent: number;
+  google_event_id: string | null;
   created_at: string;
 }
 
@@ -122,6 +133,7 @@ function rowToBooking(r: BookingRow): Booking {
     remark: r.remark,
     emailSent: !!r.email_sent,
     whatsappSent: !!r.whatsapp_sent,
+    googleEventId: r.google_event_id,
     createdAt: r.created_at,
   };
 }
@@ -249,6 +261,31 @@ export function markEmailSent(id: string): void {
 
 export function markWhatsappSent(id: string): void {
   getDb().prepare("UPDATE bookings SET whatsapp_sent = 1 WHERE id = ?").run(id);
+}
+
+export function setGoogleEventId(id: string, eventId: string | null): void {
+  getDb().prepare("UPDATE bookings SET google_event_id = ? WHERE id = ?").run(eventId, id);
+}
+
+// ---- App settings (key/value) ---------------------------------------------
+
+export function getSetting(key: string): string | null {
+  const row = getDb().prepare("SELECT value FROM settings WHERE key = ?").get(key) as
+    | { value: string }
+    | undefined;
+  return row ? row.value : null;
+}
+
+export function setSetting(key: string, value: string): void {
+  getDb()
+    .prepare(
+      "INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value"
+    )
+    .run(key, value);
+}
+
+export function deleteSetting(key: string): void {
+  getDb().prepare("DELETE FROM settings WHERE key = ?").run(key);
 }
 
 export function deleteBooking(id: string): void {

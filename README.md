@@ -10,8 +10,10 @@ and **cleaner utilisation**.
 
 ## What it does
 
-- **Dashboard** (`/`) — revenue today / this week / last 30 days, team utilisation,
-  outstanding (unpaid) amount, revenue-by-cleaner mix, and upcoming jobs.
+- **Dashboard** (`/`) — revenue today / this week, **next-week projection**,
+  **payments collected** this month with collection rate, outstanding (pending vs
+  unbilled), average job value, jobs completed/total, team utilisation,
+  revenue-by-cleaner mix, and upcoming jobs.
 - **Calendar** (`/calendar`) — week-at-a-glance schedule, colour-coded by cleaner,
   filterable. Click any empty slot to start a booking pre-filled with that day/time.
 - **New booking flow** — pick (or create) a customer, set the date / start time /
@@ -24,6 +26,8 @@ and **cleaner utilisation**.
   utilisation, job count, and revenue for the week.
 - **Customers** (`/customers`) — every client ranked by revenue, with outstanding
   balance and last job date.
+- **Settings** (`/settings`) — connect **Google Calendar** so every booking syncs
+  to the owner's calendar in real time. See [GOOGLE_CALENDAR.md](GOOGLE_CALENDAR.md).
 
 ## Pricing model
 

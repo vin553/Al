@@ -59,6 +59,7 @@ export interface Booking {
   remark: string;
   emailSent: boolean;
   whatsappSent: boolean;
+  googleEventId?: string | null; // id of the synced Google Calendar event, if any
   createdAt: string; // ISO
 }
 

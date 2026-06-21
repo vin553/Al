@@ -13,6 +13,7 @@ const links = [
   { href: "/bookings", label: "Jobs" },
   { href: "/cleaners", label: "Cleaners" },
   { href: "/customers", label: "Customers" },
+  { href: "/settings", label: "Settings" },
 ];
 
 export function TopNav() {
