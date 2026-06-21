@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Aarav & Anaya — A celebration of love, light and a thousand blessings. Join us for our wedding." />
+  <title>Aarav &amp; Anaya · A Royal Indian Wedding</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Marcellus&family=Tangerine:wght@400;700&family=Mukta:wght@300;400;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- ======================= PRELOADER ======================= -->
+  <div class="preloader" id="preloader">
+    <div class="preloader__mandala">
+      <svg viewBox="0 0 200 200" aria-hidden="true">
+        <g fill="none" stroke="currentColor" stroke-width="1.2">
+          <circle cx="100" cy="100" r="92" stroke-dasharray="4 6" />
+          <circle cx="100" cy="100" r="74" />
+          <circle cx="100" cy="100" r="54" stroke-dasharray="2 4" />
+          <circle cx="100" cy="100" r="30" />
+          <g id="petalRing"></g>
+        </g>
+      </svg>
+    </div>
+    <p class="preloader__text">शुभ विवाह</p>
+    <p class="preloader__sub">Aarav &amp; Anaya</p>
+  </div>
+
+  <!-- progress bar -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- ======================= NAV ======================= -->
+  <header class="nav" id="nav">
+    <a href="#home" class="nav__brand">
+      <span class="nav__monogram">A&amp;A</span>
+    </a>
+    <nav class="nav__links" id="navLinks">
+      <a href="#story">Our Story</a>
+      <a href="#countdown">The Day</a>
+      <a href="#events">Celebrations</a>
+      <a href="#gallery">Moments</a>
+      <a href="#rsvp" class="nav__cta">RSVP</a>
+    </nav>
+    <button class="nav__toggle" id="navToggle" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <!-- ======================= HERO ======================= -->
+  <section class="hero" id="home" data-scene>
+    <div class="hero__layer hero__sky"     data-depth="0.10"></div>
+    <div class="hero__layer hero__glow"    data-depth="0.20"></div>
+    <div class="hero__layer hero__sun"     data-depth="0.32"></div>
+
+    <!-- big rotating mandala behind the names -->
+    <div class="hero__layer hero__mandala" data-depth="0.45">
+      <svg viewBox="0 0 600 600" aria-hidden="true">
+        <g fill="none" stroke="currentColor">
+          <circle cx="300" cy="300" r="280" stroke-width="1" stroke-dasharray="2 8"/>
+          <circle cx="300" cy="300" r="230" stroke-width="1.5"/>
+          <circle cx="300" cy="300" r="180" stroke-width="1" stroke-dasharray="3 6"/>
+          <circle cx="300" cy="300" r="130" stroke-width="1.5"/>
+          <g id="heroPetals"></g>
+        </g>
+      </svg>
+    </div>
+
+    <!-- decorative arch / torana -->
+    <div class="hero__layer hero__torana" data-depth="0.6"></div>
+
+    <div class="hero__content" data-depth="0.85">
+      <p class="hero__pre">With the blessings of our families</p>
+      <h1 class="hero__names">
+        <span>Aarav</span>
+        <span class="hero__amp">&amp;</span>
+        <span>Anaya</span>
+      </h1>
+      <p class="hero__date">12 · 12 · 2026 &nbsp;•&nbsp; Udaipur, India</p>
+      <a href="#story" class="hero__btn">Begin our story</a>
+    </div>
+
+    <!-- foreground floating petals are injected by JS -->
+    <div class="petals" id="petals" aria-hidden="true"></div>
+
+    <a href="#invite" class="scroll-cue" aria-label="Scroll down">
+      <span class="scroll-cue__dot"></span>
+      <span class="scroll-cue__txt">scroll</span>
+    </a>
+  </section>
+
+  <!-- ======================= INVITATION / GANESHA ======================= -->
+  <section class="invite" id="invite">
+    <div class="invite__inner reveal">
+      <div class="invite__symbol">ॐ</div>
+      <p class="invite__line">Together with their families</p>
+      <h2 class="section-title">A Thousand Lamps, <em>One Love</em></h2>
+      <p class="invite__body">
+        As two souls become one, we invite you to walk with us through a journey of
+        colour, music and a thousand blessings. From the henna&rsquo;s first stain to
+        the seven sacred vows, every moment has been waiting for you.
+      </p>
+      <div class="divider">
+        <span class="divider__line"></span>
+        <span class="divider__icon">✦</span>
+        <span class="divider__line"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= STORY ======================= -->
+  <section class="story parallax-band" id="story" data-bg="band-1">
+    <div class="band-overlay"></div>
+    <div class="story__inner">
+      <h2 class="section-title section-title--light reveal">Our Story</h2>
+      <div class="timeline">
+        <div class="timeline__item reveal">
+          <span class="timeline__year">2018</span>
+          <h3>The First Glance</h3>
+          <p>A monsoon evening in Mumbai, a shared umbrella, and a conversation that refused to end.</p>
+        </div>
+        <div class="timeline__item reveal">
+          <span class="timeline__year">2021</span>
+          <h3>Across the Miles</h3>
+          <p>Two cities, countless letters, and a promise that distance could never dim.</p>
+        </div>
+        <div class="timeline__item reveal">
+          <span class="timeline__year">2025</span>
+          <h3>The Proposal</h3>
+          <p>Under the marble arches of Udaipur, beside the lake at golden hour, she said yes.</p>
+        </div>
+        <div class="timeline__item reveal">
+          <span class="timeline__year">2026</span>
+          <h3>Forever Begins</h3>
+          <p>And now, surrounded by everyone we love, we begin the rest of our lives.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= COUPLE ======================= -->
+  <section class="couple" id="couple">
+    <div class="couple__card reveal">
+      <div class="couple__avatar" data-initial="A"></div>
+      <h3>Aarav Mehta</h3>
+      <p class="couple__role">The Groom</p>
+      <p class="couple__bio">Architect, mountain-chaser and maker of the world&rsquo;s most questionable chai. Son of Mr. Rajesh &amp; Mrs. Sunita Mehta.</p>
+    </div>
+    <div class="couple__heart reveal">
+      <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.9-10-9.3C.2 8.3 1.6 4.6 5 4.2c2.1-.3 3.6 1 4 2 .4-1 1.9-2.3 4-2 3.4.4 4.8 4.1 3 7.5C19.5 16.1 12 21 12 21z"/></svg>
+    </div>
+    <div class="couple__card reveal">
+      <div class="couple__avatar couple__avatar--alt" data-initial="A"></div>
+      <h3>Anaya Kapoor</h3>
+      <p class="couple__role">The Bride</p>
+      <p class="couple__bio">Classical dancer, traveller and incurable optimist. Daughter of Mr. Vikram &amp; Mrs. Meera Kapoor.</p>
+    </div>
+  </section>
+
+  <!-- ======================= COUNTDOWN ======================= -->
+  <section class="countdown parallax-band" id="countdown" data-bg="band-2">
+    <div class="band-overlay"></div>
+    <div class="countdown__inner reveal">
+      <p class="countdown__pre">Counting every heartbeat until</p>
+      <h2 class="section-title section-title--light">The Big Day</h2>
+      <div class="countdown__grid" id="countdownGrid">
+        <div class="countdown__cell"><span id="cd-days">00</span><label>Days</label></div>
+        <div class="countdown__cell"><span id="cd-hours">00</span><label>Hours</label></div>
+        <div class="countdown__cell"><span id="cd-mins">00</span><label>Minutes</label></div>
+        <div class="countdown__cell"><span id="cd-secs">00</span><label>Seconds</label></div>
+      </div>
+      <p class="countdown__date">Saturday, 12 December 2026 · The City Palace, Udaipur</p>
+    </div>
+  </section>
+
+  <!-- ======================= EVENTS ======================= -->
+  <section class="events" id="events">
+    <h2 class="section-title reveal">The Celebrations</h2>
+    <p class="section-sub reveal">Five days of joy, colour and tradition.</p>
+    <div class="events__grid">
+      <article class="event-card reveal" style="--accent:#1f8a70">
+        <div class="event-card__icon">🌿</div>
+        <span class="event-card__day">Day One</span>
+        <h3>Mehndi</h3>
+        <p class="event-card__time">10 Dec · 4:00 PM</p>
+        <p>Intricate henna, live folk music and an afternoon dipped in green and gold.</p>
+      </article>
+      <article class="event-card reveal" style="--accent:#e9a40c">
+        <div class="event-card__icon">🌼</div>
+        <span class="event-card__day">Day Two</span>
+        <h3>Haldi</h3>
+        <p class="event-card__time">11 Dec · 11:00 AM</p>
+        <p>A sunlit morning of turmeric, laughter and blessings smeared with love.</p>
+      </article>
+      <article class="event-card reveal" style="--accent:#c2185b">
+        <div class="event-card__icon">🎉</div>
+        <span class="event-card__day">Day Two</span>
+        <h3>Sangeet</h3>
+        <p class="event-card__time">11 Dec · 7:30 PM</p>
+        <p>A night of dance-offs, dhol beats and choreographed chaos. Bring your moves.</p>
+      </article>
+      <article class="event-card reveal" style="--accent:#8b1a1a">
+        <div class="event-card__icon">🔥</div>
+        <span class="event-card__day">Day Three</span>
+        <h3>The Wedding</h3>
+        <p class="event-card__time">12 Dec · 6:00 PM</p>
+        <p>Seven vows around the sacred fire, beneath a canopy of marigold and stars.</p>
+      </article>
+      <article class="event-card reveal" style="--accent:#6a3fb5">
+        <div class="event-card__icon">✨</div>
+        <span class="event-card__day">Day Three</span>
+        <h3>Reception</h3>
+        <p class="event-card__time">12 Dec · 9:00 PM</p>
+        <p>Champagne, lights over the lake, and a first dance you won&rsquo;t forget.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ======================= GALLERY ======================= -->
+  <section class="gallery" id="gallery">
+    <h2 class="section-title reveal">Moments</h2>
+    <p class="section-sub reveal">A few of the frames that brought us here.</p>
+    <div class="gallery__grid" id="galleryGrid"></div>
+  </section>
+
+  <!-- ======================= VENUE ======================= -->
+  <section class="venue parallax-band" id="venue" data-bg="band-3">
+    <div class="band-overlay"></div>
+    <div class="venue__inner reveal">
+      <h2 class="section-title section-title--light">The City Palace</h2>
+      <p class="venue__addr">Udaipur, Rajasthan · India</p>
+      <p class="venue__body">
+        Perched above the shimmering waters of Lake Pichola, the City Palace is a
+        four-hundred-year-old vision of marble, mirror and gold — the perfect stage
+        for a love story this grand.
+      </p>
+      <a class="hero__btn" href="https://maps.google.com/?q=City+Palace+Udaipur" target="_blank" rel="noopener">View on map</a>
+    </div>
+  </section>
+
+  <!-- ======================= RSVP ======================= -->
+  <section class="rsvp" id="rsvp">
+    <div class="rsvp__inner reveal">
+      <div class="invite__symbol">✉</div>
+      <h2 class="section-title">Will you join us?</h2>
+      <p class="section-sub">Kindly respond by 1 November 2026.</p>
+      <form class="rsvp__form" id="rsvpForm" novalidate>
+        <div class="rsvp__row">
+          <label>
+            <span>Your Name</span>
+            <input type="text" name="name" required placeholder="Full name" />
+          </label>
+          <label>
+            <span>Email</span>
+            <input type="email" name="email" required placeholder="you@email.com" />
+          </label>
+        </div>
+        <div class="rsvp__row">
+          <label>
+            <span>Will you attend?</span>
+            <select name="attending" required>
+              <option value="">Select…</option>
+              <option value="yes">Joyfully accepts</option>
+              <option value="no">Regretfully declines</option>
+            </select>
+          </label>
+          <label>
+            <span>Number of guests</span>
+            <input type="number" name="guests" min="1" max="10" value="1" />
+          </label>
+        </div>
+        <label class="rsvp__full">
+          <span>A note for the couple</span>
+          <textarea name="message" rows="3" placeholder="Send your blessings…"></textarea>
+        </label>
+        <button type="submit" class="hero__btn rsvp__submit">Send with love</button>
+        <p class="rsvp__thanks" id="rsvpThanks" hidden>
+          Thank you — your blessing has reached our hearts. 💛
+        </p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ======================= FOOTER ======================= -->
+  <footer class="footer">
+    <div class="footer__mandala">
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <g fill="none" stroke="currentColor" stroke-width="1">
+          <circle cx="60" cy="60" r="54" stroke-dasharray="2 5"/>
+          <circle cx="60" cy="60" r="40"/>
+          <circle cx="60" cy="60" r="24" stroke-dasharray="1 3"/>
+        </g>
+      </svg>
+    </div>
+    <p class="footer__names">Aarav &amp; Anaya</p>
+    <p class="footer__quote">&ldquo;Two flames, one light — forever.&rdquo;</p>
+    <p class="footer__credit">12 December 2026 · Made with love &amp; a little bit of magic</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
