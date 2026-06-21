@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -14,66 +12,125 @@ import {
 import {
   ArrowUpRight,
   BadgeCheck,
+  BarChart3,
+  Building2,
   CalendarCheck2,
+  CalendarRange,
+  Calculator,
   Camera,
   Check,
   Clock,
   CreditCard,
+  FileText,
+  Gift,
+  Globe,
   LayoutDashboard,
+  ListChecks,
   Lock,
+  MapPin,
+  Megaphone,
+  MessageSquare,
+  Package,
   Plug,
   QrCode,
+  Repeat,
+  ShieldCheck,
+  Smartphone,
   Sparkles,
+  Star,
   Trophy,
+  UserCircle,
   Users,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 
 const ICONS: Record<string, LucideIcon> = {
   LayoutDashboard,
+  MessageSquare,
   CalendarCheck2,
   Plug,
   QrCode,
   CreditCard,
+  FileText,
+  Wallet,
+  Calculator,
+  Globe,
+  UserCircle,
   BadgeCheck,
   Trophy,
-  Users,
+  Gift,
+  Star,
+  Megaphone,
+  Repeat,
   Clock,
   Camera,
+  ListChecks,
+  Package,
+  MapPin,
+  Users,
+  Smartphone,
+  CalendarRange,
+  ShieldCheck,
+  BarChart3,
+  Building2,
 };
+
+interface PlanInfo {
+  name: string;
+  price: string;
+  cadence: string;
+  includedUsers: number;
+  extraUser: string;
+  blurb: string;
+}
 
 interface Props {
   modules: ModuleDef[];
   unlocked: string[];
   progress: GrowthProgress;
+  plan: PlanInfo;
+  salesUrl: string;
 }
 
-export function GrowClient({ modules, unlocked, progress }: Props) {
-  const router = useRouter();
-  const [busy, setBusy] = useState<string | null>(null);
+export function GrowClient({ modules, unlocked, progress, plan, salesUrl }: Props) {
   const unlockedSet = new Set(unlocked);
-
   const total = modules.length;
-  const unlockedCount = modules.filter((m) => unlockedSet.has(m.key)).length;
-
-  async function toggle(key: string, action: "unlock" | "lock") {
-    setBusy(key);
-    try {
-      await fetch("/api/modules", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key, action }),
-      });
-      router.refresh();
-    } finally {
-      setBusy(null);
-    }
-  }
+  const enabledCount = modules.filter((m) => unlockedSet.has(m.key)).length;
 
   return (
     <div className="space-y-8">
+      {/* Base plan banner */}
+      <Card className="overflow-hidden border-primary/20 bg-primary/[0.03]">
+        <CardContent className="flex flex-wrap items-center justify-between gap-6 p-6">
+          <div className="max-w-xl">
+            <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Your plan
+            </div>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-2xl font-semibold tracking-tight">{plan.name}</span>
+              <span className="text-2xl font-semibold tabular-nums">{plan.price}</span>
+              <span className="text-sm text-muted-foreground">{plan.cadence}</span>
+            </div>
+            <p className="mt-2 text-sm text-muted-foreground">{plan.blurb}</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Includes up to {plan.includedUsers} users · {plan.extraUser}
+            </p>
+          </div>
+          <a
+            href={salesUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          >
+            <CalendarRange className="h-4 w-4" />
+            Book a strategy call
+          </a>
+        </CardContent>
+      </Card>
+
       {/* Gamified progress header */}
-      <Card className="overflow-hidden border-primary/20">
+      <Card className="overflow-hidden">
         <CardContent className="p-6">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
@@ -87,12 +144,10 @@ export function GrowClient({ modules, unlocked, progress }: Props) {
             <div className="text-right">
               <div className="text-2xl font-semibold tabular-nums">{progress.points} pts</div>
               <div className="text-xs text-muted-foreground">
-                {unlockedCount} of {total} tools unlocked
+                {enabledCount} of {total} tools active
               </div>
             </div>
           </div>
-
-          {/* Progress to next level */}
           <div className="mt-4">
             <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted">
               <motion.span
@@ -104,8 +159,8 @@ export function GrowClient({ modules, unlocked, progress }: Props) {
             </div>
             <div className="mt-2 text-xs text-muted-foreground">
               {progress.nextLevel
-                ? `${progress.pointsToNext} pts to ${progress.nextLevel.name} — unlock more tools to level up.`
-                : "Top level reached — every tool unlocked. 🎉"}
+                ? `${progress.pointsToNext} pts to ${progress.nextLevel.name} — add modules to level up.`
+                : "Top level reached — every module active. 🎉"}
             </div>
           </div>
         </CardContent>
@@ -125,32 +180,37 @@ export function GrowClient({ modules, unlocked, progress }: Props) {
                 <ModuleCard
                   key={m.key}
                   mod={m}
-                  unlocked={unlockedSet.has(m.key)}
-                  busy={busy === m.key}
+                  enabled={unlockedSet.has(m.key)}
                   index={i}
-                  onToggle={toggle}
+                  salesUrl={salesUrl}
                 />
               ))}
             </div>
           </section>
         );
       })}
+
+      <p className="pt-2 text-center text-xs text-muted-foreground">
+        Add-on modules are enabled after a quick chat —{" "}
+        <a href={salesUrl} target="_blank" rel="noreferrer" className="underline">
+          book a call
+        </a>{" "}
+        to switch any of them on. Pricing shown is indicative.
+      </p>
     </div>
   );
 }
 
 function ModuleCard({
   mod,
-  unlocked,
-  busy,
+  enabled,
   index,
-  onToggle,
+  salesUrl,
 }: {
   mod: ModuleDef;
-  unlocked: boolean;
-  busy: boolean;
+  enabled: boolean;
   index: number;
-  onToggle: (key: string, action: "unlock" | "lock") => void;
+  salesUrl: string;
 }) {
   const Icon = ICONS[mod.icon] ?? Sparkles;
   const included = mod.includedByDefault;
@@ -159,20 +219,15 @@ function ModuleCard({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.04 }}
+      transition={{ duration: 0.3, delay: Math.min(index, 6) * 0.04 }}
     >
-      <Card
-        className={cn(
-          "flex h-full flex-col transition-colors",
-          unlocked ? "border-primary/30" : "opacity-95"
-        )}
-      >
+      <Card className={cn("flex h-full flex-col", enabled && "border-primary/30")}>
         <CardContent className="flex flex-1 flex-col gap-3 p-5">
           <div className="flex items-start justify-between">
             <span
               className={cn(
                 "inline-flex h-9 w-9 items-center justify-center rounded-lg",
-                unlocked ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                enabled ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
               )}
             >
               <Icon className="h-5 w-5" />
@@ -180,12 +235,12 @@ function ModuleCard({
             <div className="flex items-center gap-1.5">
               {mod.status === "soon" && !included && (
                 <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-                  Preview
+                  Add-on
                 </span>
               )}
-              {unlocked ? (
+              {enabled ? (
                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
-                  <Check className="h-3 w-3" /> {included ? "Included" : "Unlocked"}
+                  <Check className="h-3 w-3" /> {included ? "Included" : "Active"}
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
@@ -209,34 +264,23 @@ function ModuleCard({
           </ul>
 
           <div className="mt-auto flex items-center justify-between pt-2">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">{mod.priceLabel}</span>
-              {mod.points > 0 && (
-                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
-                  +{mod.points} pts
-                </span>
-              )}
-            </div>
-
+            <span className="text-sm font-medium">{mod.priceLabel}</span>
             {included ? (
               <span className="text-xs font-medium text-muted-foreground">Active</span>
-            ) : unlocked ? (
-              <button
-                onClick={() => onToggle(mod.key, "lock")}
-                disabled={busy}
-                className="rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-secondary disabled:opacity-50"
-              >
-                {busy ? "…" : "Lock"}
-              </button>
+            ) : enabled ? (
+              <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                Enabled
+              </span>
             ) : (
-              <button
-                onClick={() => onToggle(mod.key, "unlock")}
-                disabled={busy}
-                className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+              <a
+                href={salesUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"
               >
-                {busy ? "…" : "Unlock"}
-                {!busy && <ArrowUpRight className="h-3 w-3" />}
-              </button>
+                Book a call
+                <ArrowUpRight className="h-3 w-3" />
+              </a>
             )}
           </div>
         </CardContent>

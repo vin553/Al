@@ -1,6 +1,6 @@
 import { PageHeader } from "@/components/page-header";
 import { GrowClient } from "@/components/grow-client";
-import { MODULES } from "@/lib/modules";
+import { MODULES, PLAN, SALES_CALL_URL } from "@/lib/modules";
 import { getUnlockedKeys, growthProgress } from "@/lib/entitlements";
 
 export const runtime = "nodejs";
@@ -14,10 +14,16 @@ export default function GrowPage() {
     <div className="container max-w-6xl space-y-8 py-8">
       <PageHeader
         eyebrow="Grow your business"
-        title="Tools & upgrades"
-        description="Unlock modules as you grow. Each tool you switch on levels up your business and adds new capabilities — payments, loyalty, staff, and more."
+        title="Plan & add-ons"
+        description="Your base plan runs the day-to-day. Switch on add-on modules as you grow — payments, customer growth, field ops, team, and insights."
       />
-      <GrowClient modules={MODULES} unlocked={unlocked} progress={progress} />
+      <GrowClient
+        modules={MODULES}
+        unlocked={unlocked}
+        progress={progress}
+        plan={PLAN}
+        salesUrl={SALES_CALL_URL}
+      />
     </div>
   );
 }

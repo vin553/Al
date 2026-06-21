@@ -1,5 +1,19 @@
 # Product & Monetization Roadmap
 
+## Pricing & packaging
+
+- **Base plan — "Operations Suite": S$999/mo**, includes up to **10 users**, then
+  **+S$49 / extra user / mo**. Covers the day-to-day: booking, scheduling,
+  customers, cleaners, dispatch, notifications, Google Calendar sync, payments
+  tracking, and the live dashboard.
+- **Add-on modules** are sold **sales-led**: each locked module on the Grow page
+  CTAs to a **strategy call** (https://cal.com/vin-mesh-exyqwy/30min). Module
+  prices shown in-app are indicative and finalised on the call.
+- Later, enabling a module is automated via Stripe (Layer A billing). Until then,
+  modules are switched on per account after the call (entitlement engine).
+
+
+
 This captures the vision for turning the booking app into a **modular,
 gamified platform** you sell to cleaning businesses, where features unlock in
 stages and every unlock is connected to sales.
