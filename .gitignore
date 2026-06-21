@@ -20,3 +20,6 @@ tsconfig.tsbuildinfo
 
 # Temple site — never commit real Stripe keys
 httpdocs/stripe-config.php
+
+# Local preview screenshots (delivered to user, not source)
+shots/
