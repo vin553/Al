@@ -53,6 +53,25 @@ export function weekDates(weekStart: string): string[] {
   return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 }
 
+/** First day ("YYYY-MM-01") of the calendar month containing the given date. */
+export function startOfMonth(dateStr: string): string {
+  const [y, m] = dateStr.split("-").map(Number);
+  return `${y}-${String(m).padStart(2, "0")}-01`;
+}
+
+/** Last day of the calendar month containing the given date. */
+export function endOfMonth(dateStr: string): string {
+  const [y, m] = dateStr.split("-").map(Number);
+  const lastDay = new Date(y, m, 0).getDate(); // day 0 of next month = last of this
+  return `${y}-${String(m).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+}
+
+/** Human label for the month, e.g. "June". */
+export function monthLabel(dateStr: string): string {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("en-SG", { month: "long" });
+}
+
 export function formatDateLong(dateStr: string): string {
   const [y, m, d] = dateStr.split("-").map(Number);
   return new Date(y, m - 1, d).toLocaleDateString("en-SG", {

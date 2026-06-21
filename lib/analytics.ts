@@ -1,7 +1,16 @@
 // Revenue, payment, and utilisation analytics derived from bookings.
 
 import type { BookingDetail, Cleaner } from "./types";
-import { addDays, durationHours, today, weekdayOf, startOfWeek, formatDateShort } from "./dates";
+import {
+  addDays,
+  durationHours,
+  today,
+  weekdayOf,
+  startOfWeek,
+  startOfMonth,
+  endOfMonth,
+  formatDateShort,
+} from "./dates";
 
 function billable(b: BookingDetail): boolean {
   return b.jobStatus !== "cancelled";
@@ -54,6 +63,63 @@ export function statsForRange(
     availableHours,
     utilisation: availableHours > 0 ? bookedHours / availableHours : 0,
     outstanding,
+  };
+}
+
+/**
+ * Payment breakdown over a range: how much has actually been collected vs
+ * still owed. Drives the "money in the bank" view a business owner cares about.
+ */
+export interface PaymentSummary {
+  collected: number; // paymentStatus === "done"
+  pending: number; // invoiced, awaiting payment
+  unbilled: number; // work done/booked, not yet invoiced
+  billed: number; // total billable value (collected + pending + unbilled)
+  outstanding: number; // pending + unbilled
+  collectionRate: number; // collected / billed, 0..1
+}
+
+export function paymentSummary(
+  bookings: BookingDetail[],
+  from: string,
+  to: string
+): PaymentSummary {
+  const inRange = bookings.filter((b) => b.date >= from && b.date <= to && billable(b));
+  const sum = (status: BookingDetail["paymentStatus"]) =>
+    inRange.filter((b) => b.paymentStatus === status).reduce((s, b) => s + b.amount, 0);
+  const collected = sum("done");
+  const pending = sum("pending");
+  const unbilled = sum("unbilled");
+  const billed = collected + pending + unbilled;
+  return {
+    collected,
+    pending,
+    unbilled,
+    billed,
+    outstanding: pending + unbilled,
+    collectionRate: billed > 0 ? collected / billed : 0,
+  };
+}
+
+/** Job counts by status over a range. */
+export interface JobCounts {
+  total: number; // billable (excludes cancelled)
+  completed: number;
+  scheduled: number;
+  cancelled: number;
+  avgValue: number; // average billable job amount
+}
+
+export function jobCounts(bookings: BookingDetail[], from: string, to: string): JobCounts {
+  const inRange = bookings.filter((b) => b.date >= from && b.date <= to);
+  const billableJobs = inRange.filter(billable);
+  const revenue = billableJobs.reduce((s, b) => s + b.amount, 0);
+  return {
+    total: billableJobs.length,
+    completed: inRange.filter((b) => b.jobStatus === "completed").length,
+    scheduled: inRange.filter((b) => b.jobStatus === "scheduled").length,
+    cancelled: inRange.filter((b) => b.jobStatus === "cancelled").length,
+    avgValue: billableJobs.length > 0 ? revenue / billableJobs.length : 0,
   };
 }
 
@@ -153,9 +219,14 @@ export function revenueByCleaner(
 /** Convenience: common reporting ranges anchored to today. */
 export function reportingRanges() {
   const t = today();
+  const weekStart = startOfWeek(t);
+  const nextWeekStart = addDays(weekStart, 7);
   return {
     today: { from: t, to: t },
-    week: { from: startOfWeek(t), to: addDays(startOfWeek(t), 6) },
-    month: { from: addDays(t, -29), to: t },
+    week: { from: weekStart, to: addDays(weekStart, 6) },
+    nextWeek: { from: nextWeekStart, to: addDays(nextWeekStart, 6) },
+    month: { from: addDays(t, -29), to: t }, // rolling 30 days
+    thisMonth: { from: startOfMonth(t), to: endOfMonth(t) }, // calendar month
+    monthToDate: { from: startOfMonth(t), to: t },
   };
 }
