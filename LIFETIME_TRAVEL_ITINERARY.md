@@ -10,15 +10,15 @@ This plan is only as good as its inputs. I made the following assumptions so I c
 
 | Variable | Assumption used |
 |---|---|
-| Age now (2026) | **35** (planning horizon to **age 85 / year 2076**) |
+| Age now (2026) | **35** — confirmed (planning horizon to **age 85 / year 2076**) |
 | Health | Currently fit and able; capacity gently declines after ~60, more after ~75 |
-| Budget | Comfortable / upper-middle, flexible — splurge on the irreplaceable, save on the repeatable |
+| Finances | **Net worth ~S$2,000,000, growing ~S$500,000/year** — confirmed. Premium/luxury tier; travel funded from returns, not principal (see Financial Plan below) |
 | Pace | ~2–3 trips/year while young, tapering to 1 slower trip/year later |
 | Travel style | Broad: nature + culture + food + adventure + wellness, not a single niche |
 | Constraints | No major mobility/medical limits assumed; no children's school calendar assumed |
-| Home base | Long-haul flights are acceptable now; preference shifts to shorter/easier later |
+| Home base | Singapore assumed (SGD, Asia-Pacific hub); long-haul fine now, preference shifts to shorter/easier later |
 
-If you give me your **real age, rough budget band, who you travel with, and any health flags**, I'll tighten every date and add a cost estimate per trip.
+Still open (tell me and I'll tighten further): **who you travel with** (solo / partner / future family), **any health flags**, and whether you want a **leaner or even more lavish** spend than the premium tier I've set below.
 
 ---
 
@@ -246,6 +246,47 @@ Five evidence-based principles drive the sequencing. This isn't decoration — i
 | **55–65** | Burgundy, Trans-Siberian, Cape winelands, alpine rail | Refinement — the sensory, curated world |
 | **65–75** | Alaska, fjords, Nile, river cruises, aurora lodges | Wonder, with the strain removed |
 | **75–85+** | Tuscany villa, Kyoto, family bases, first-love returns | Meaning, presence, and the people |
+
+---
+
+## Financial Plan & Per-Trip Budgets (SGD)
+
+> *The headline: you can afford every trip in this plan at a premium tier without ever touching your principal. At ~S$2M growing ~S$500k/year, your wealth is compounding far faster than even a generous travel budget draws down. Travel here is paid for by a slice of your **growth**, not your **capital**.*
+
+### Can you afford it? (yes — comfortably)
+
+- **Your net-worth growth is ~S$500,000/year and rising.** This plan's premium-tier travel averages **~S$55,000/year** over the full 50 years (~S$2.7M lifetime). That's roughly **10–11% of your *annual growth*** in the early years — and a *shrinking* share every year as your wealth compounds.
+- **By your 50s–60s**, investment returns alone (on a portfolio likely in the S$10–25M+ range) will exceed your entire annual travel spend several times over. The luxury phases (private rail, expedition suites, river cruises) land exactly when they're most trivially affordable.
+- **Rule of thumb to stay guilt-free:** cap travel at **≤15% of each year's net-worth growth**. At today's S$500k growth that's a S$75k/year ceiling — above the ~S$45–55k the early years actually need, leaving headroom for upgrades.
+
+### Recommended tier: "Comfortable Premium" (with Ultra splurges on milestones)
+
+| Element | Default tier | Milestone-trip upgrade |
+|---|---|---|
+| Long-haul flights | Premium economy now → **Business from your mid-40s** | First class on the 50th/60th journeys |
+| Lodging | 4–5★ + characterful boutique / ryokan / safari lodge | Aman / &Beyond / Singita level |
+| Guiding | Private guides for marquee sites; small-group for treks | Fully private, fixer-led |
+| Expeditions | Premium operators (e.g. cabin-class on Antarctica/Galápagos) | Suite-class cabins, helicopter add-ons |
+
+### Per-trip estimates by phase (premium tier, all-in per person, SGD)
+
+| Phase | Typical trip cost | Notable splurges | Annual travel spend |
+|---|---|---|---|
+| **I · Adventure (35–45)** | S$12k–22k | **Antarctica S$30–45k**; Kilimanjaro+Serengeti S$20–28k; Galápagos/Komodo diving S$15–22k | **~S$40–55k/yr** (2 trips) |
+| **II · Immersion (45–55)** | S$15k–30k (longer trips) | Deep-Japan 50th **S$40–50k**; India/Silk Road 18–21 days S$22–30k | **~S$45–60k/yr** |
+| **III · Connoisseurship (55–65)** | S$20k–35k | Trans-Siberian / private luxury rail 60th **S$45–60k**; Burgundy harvest S$25–35k | **~S$55–70k/yr** |
+| **IV · Accessible Wonder (65–75)** | S$20k–40k | Fjords/North Cape 70th S$30–45k; suite-class river & ocean cruises | **~S$60–75k/yr** |
+| **V · Legacy & Return (75–85+)** | S$15k–35k | Multi-gen Tuscany villa S$40k+ (hosting family) | **~S$40–60k/yr** |
+
+*Estimates are per person at premium tier and exclude trips you may add for a partner/family — roughly **+70–90% for two travelling together** (flights and most tours don't double, lodging does). If you travel as a couple, plan on ~**S$80–100k/year** and it's still under 20% of your growth.*
+
+### The funding logic, plainly
+
+1. **Don't budget travel from income — budget it from a dedicated "experiences" sleeve.** Carve out ~S$75k/year (rising with inflation) into a separate liquid bucket. Top it up from annual growth; spend it down without guilt.
+2. **Front-load the spend that's tied to your body, not your wallet.** The Phase I adventure trips are the cheapest *and* the most age-sensitive — do them now regardless of where markets are.
+3. **Let the luxury phases ride the compounding.** Private rail, suites, and multi-week journeys are deliberately placed in your 50s–70s, when your portfolio makes them rounding errors.
+4. **Inflation-index everything.** The SGD figures above are in today's money. At ~3% travel inflation, the same trips cost ~80% more by your 60s — but your wealth will have far outpaced that.
+5. **Milestone splurges are pre-approved.** The 40th, 50th, 60th, and 70th flagship trips are where to spend without flinching; they're the memories the peak-end rule says you'll keep.
 
 ---
 
