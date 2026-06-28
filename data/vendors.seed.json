@@ -1,0 +1,211 @@
+{
+  "$schema": "./vendors.schema.json",
+  "collectedAt": "2026-04-23T00:00:00.000Z",
+  "marketContext": {
+    "countryIso": "SG",
+    "segment": "Indian luxury weddings",
+    "typicalBudgetSgd": [20000, 150000],
+    "note": "Singapore Indian weddings typically run SGD 20k–150k+; per-pax costs span SGD 38 (temple all-inclusive) → SGD 148+ (hotel ballroom). Sources: Alangkaar venue price list, Holiday Inn Atrium packages."
+  },
+  "vendors": [
+    {
+      "slug": "alangkaar",
+      "name": "Alangkaar",
+      "tagline": "Southeast Asia's full-stack Indian wedding house — 28 years, 97 staff, 22 approved venues.",
+      "foundedYear": 1996,
+      "url": "https://alangkaar.com.sg",
+      "instagramHandle": "alangkaar",
+      "instagramFollowers": 22000,
+      "googleRating": 4.8,
+      "googleReviews": 210,
+      "services": [
+        "planning",
+        "coordination",
+        "decor",
+        "mandap",
+        "photography",
+        "videography",
+        "catering",
+        "floral",
+        "bridal-makeup",
+        "henna",
+        "outfits",
+        "pre-wedding-shoot",
+        "destination",
+        "entertainment"
+      ],
+      "pricing": [
+        { "tier": "entry", "label": "Temple all-inclusive (from)", "perPaxSgd": [38, 56] },
+        { "tier": "mid", "label": "Community hall / country club", "perPaxSgd": [56, 88] },
+        { "tier": "premium", "label": "Hotel ballroom", "perPaxSgd": [70, 115] },
+        { "tier": "luxury", "label": "Destination (Bali/Thailand/Vietnam)", "packageSgd": [50000, 70000] },
+        { "tier": "mid", "label": "Day-of coordination", "packageSgd": [888, 888] },
+        { "tier": "premium", "label": "Full wedding management", "packageSgd": [3888, 3888] },
+        { "tier": "premium", "label": "Decoration (Essential → Grand)", "packageSgd": [2888, 5000] }
+      ],
+      "dataConfidence": "verified",
+      "sources": [
+        { "url": "https://alangkaar.com.sg/alangkaar-packages", "note": "Package tiers + pricing" },
+        { "url": "https://alangkaar.com.sg/indian-wedding-venues-in-singapore", "note": "Venue price list ($38–$115/pax)" },
+        { "url": "https://alangkaar.com.sg/alangkaar-services-and-price-packages/", "note": "Services & destination pricing" },
+        { "url": "https://www.instagram.com/alangkaar/", "note": "IG handle, ~22K followers" }
+      ],
+      "updatedAt": "2026-04-23T00:00:00.000Z"
+    },
+    {
+      "slug": "8-asthas",
+      "name": "8 Asthas",
+      "tagline": "Premium boutique planner at 418 Race Course Rd — elegant, well-coordinated celebrations.",
+      "foundedYear": 2016,
+      "url": "https://8asthas.com",
+      "instagramHandle": "8asthas",
+      "instagramFollowers": 6800,
+      "googleRating": 4.9,
+      "googleReviews": 48,
+      "services": [
+        "planning",
+        "coordination",
+        "decor",
+        "mandap",
+        "photography",
+        "videography",
+        "bridal-makeup",
+        "henna",
+        "pre-wedding-shoot"
+      ],
+      "pricing": [
+        { "tier": "premium", "label": "Full planning", "packageSgd": [6000, 15000] },
+        { "tier": "premium", "label": "Decor + coordination", "packageSgd": [4000, 9000] },
+        { "tier": "mid", "label": "Pre-wedding shoot", "packageSgd": [1200, 3500] }
+      ],
+      "dataConfidence": "partial",
+      "sources": [
+        { "url": "https://8asthas.com/", "note": "Services, positioning" },
+        { "url": "https://8asthas.com/services/", "note": "Service breadth" },
+        { "url": "https://finestservices.com.sg/indian-wedding-planner/", "note": "Third-party listing" }
+      ],
+      "updatedAt": "2026-04-23T00:00:00.000Z"
+    },
+    {
+      "slug": "km-wedding",
+      "name": "KM Wedding Services",
+      "tagline": "Pioneer of modern Indian wedding decor in Singapore since 1996 — Mr & Mrs Kumar.",
+      "foundedYear": 1996,
+      "url": "https://kmwedding.com.sg",
+      "instagramHandle": "kmweddingservices",
+      "instagramFollowers": 4200,
+      "googleRating": 4.7,
+      "googleReviews": 35,
+      "services": [
+        "decor",
+        "mandap",
+        "floral",
+        "photography",
+        "videography",
+        "bridal-car",
+        "cake"
+      ],
+      "pricing": [
+        { "tier": "entry", "label": "Void deck decor", "packageSgd": [1500, 3500] },
+        { "tier": "mid", "label": "Hall theme decor", "packageSgd": [3500, 8000] },
+        { "tier": "premium", "label": "Hotel mandap & full decor", "packageSgd": [8000, 18000] }
+      ],
+      "dataConfidence": "partial",
+      "sources": [
+        { "url": "https://kmwedding.com.sg/", "note": "Services, history since 1996" },
+        { "url": "https://www.bridely.sg/vendor/km-wedding-services-deco/r/recF4ZhRFIucOjTHj", "note": "Reviews aggregator" },
+        { "url": "https://www.facebook.com/61552070197461", "note": "Facebook page" }
+      ],
+      "updatedAt": "2026-04-23T00:00:00.000Z"
+    },
+    {
+      "slug": "divine-bride",
+      "name": "Divine Bride",
+      "tagline": "Boutique South Asian wedding curation — intimate, editorial, story-first.",
+      "foundedYear": 2019,
+      "url": "https://divinebride.sg",
+      "instagramHandle": "divinebride.sg",
+      "instagramFollowers": 3100,
+      "googleRating": 4.6,
+      "googleReviews": 18,
+      "services": [
+        "planning",
+        "coordination",
+        "decor",
+        "photography",
+        "bridal-makeup",
+        "henna",
+        "outfits"
+      ],
+      "pricing": [
+        { "tier": "mid", "label": "Intimate ceremony package", "packageSgd": [3500, 7000] },
+        { "tier": "premium", "label": "Full wedding curation", "packageSgd": [7000, 16000] }
+      ],
+      "dataConfidence": "estimated",
+      "sources": [
+        { "url": "https://singaporebrides.com/articles/2019/12/top-indian-bridal-makeup-artists-singapore/", "note": "Adjacent SG Indian wedding vendor landscape" }
+      ],
+      "updatedAt": "2026-04-23T00:00:00.000Z"
+    },
+    {
+      "slug": "rasa-weddings",
+      "name": "Rasa Weddings",
+      "tagline": "Emerging boutique planner — clean modern aesthetics for Indian weddings in SG.",
+      "foundedYear": 2021,
+      "url": "https://rasaweddings.sg",
+      "instagramHandle": "rasaweddings",
+      "instagramFollowers": 1800,
+      "googleRating": 4.5,
+      "googleReviews": 9,
+      "services": [
+        "planning",
+        "coordination",
+        "decor",
+        "floral",
+        "pre-wedding-shoot"
+      ],
+      "pricing": [
+        { "tier": "mid", "label": "Coordination + decor", "packageSgd": [3000, 6500] },
+        { "tier": "premium", "label": "Full planning", "packageSgd": [6500, 12000] }
+      ],
+      "dataConfidence": "estimated",
+      "sources": [
+        { "url": "https://finestservices.com.sg/indian-wedding-planner/", "note": "SG Indian wedding planner landscape" }
+      ],
+      "updatedAt": "2026-04-23T00:00:00.000Z"
+    },
+    {
+      "slug": "1-stop-wedding",
+      "name": "1-Stop Wedding",
+      "tagline": "Budget-friendly all-in-one packager — temple to ballroom, one contract.",
+      "foundedYear": 2015,
+      "url": "https://1stopwedding.sg",
+      "instagramHandle": "1stopwedding.sg",
+      "instagramFollowers": 2400,
+      "googleRating": 4.3,
+      "googleReviews": 52,
+      "services": [
+        "planning",
+        "coordination",
+        "decor",
+        "photography",
+        "videography",
+        "catering",
+        "bridal-makeup",
+        "outfits",
+        "cake",
+        "invites"
+      ],
+      "pricing": [
+        { "tier": "entry", "label": "Temple all-in package", "perPaxSgd": [40, 60] },
+        { "tier": "mid", "label": "Community hall all-in", "perPaxSgd": [55, 85] },
+        { "tier": "mid", "label": "Coordination only", "packageSgd": [1200, 2500] }
+      ],
+      "dataConfidence": "estimated",
+      "sources": [
+        { "url": "https://alangkaar.com.sg/indian-wedding-venues-in-singapore", "note": "SG Indian temple/hall price benchmarks" }
+      ],
+      "updatedAt": "2026-04-23T00:00:00.000Z"
+    }
+  ]
+}
