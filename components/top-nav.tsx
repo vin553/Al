@@ -4,13 +4,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { GithubIcon, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
+import { COMPANY } from "@/lib/seed-data";
 
 const links = [
   { href: "/", label: "Dashboard" },
-  { href: "/compare", label: "Compare" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/positioning", label: "Positioning" },
+  { href: "/calendar", label: "Calendar" },
+  { href: "/bookings", label: "Jobs" },
+  { href: "/cleaners", label: "Cleaners" },
+  { href: "/customers", label: "Customers" },
+  { href: "/grow", label: "Grow" },
+  { href: "/settings", label: "Settings" },
 ];
 
 export function TopNav() {
@@ -21,11 +25,12 @@ export function TopNav() {
         <Link href="/" className="mr-8 flex items-center gap-2 font-semibold tracking-tight">
           <span
             aria-hidden
-            className="inline-flex h-6 w-6 items-center justify-center rounded bg-foreground text-background"
+            className="inline-flex h-6 w-6 items-center justify-center rounded bg-primary text-primary-foreground"
           >
             <Sparkles className="h-3.5 w-3.5" />
           </span>
-          <span>SG Wedding Intel</span>
+          <span className="hidden sm:inline">{COMPANY.shortName}</span>
+          <span className="sm:hidden">{COMPANY.shortName}</span>
         </Link>
         <nav className="flex items-center gap-1 text-sm">
           {links.map((l) => {
@@ -46,16 +51,13 @@ export function TopNav() {
             );
           })}
         </nav>
-        <div className="ml-auto flex items-center gap-1">
-          <a
-            href="https://github.com"
-            aria-label="GitHub"
-            className="hidden rounded-md p-2 text-muted-foreground hover:bg-secondary/60 hover:text-foreground sm:inline-flex"
-            target="_blank"
-            rel="noreferrer"
+        <div className="ml-auto flex items-center gap-2">
+          <Link
+            href="/bookings?new=1"
+            className="hidden rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 sm:inline-flex"
           >
-            <GithubIcon className="h-4 w-4" />
-          </a>
+            + New booking
+          </Link>
           <ThemeToggle />
         </div>
       </div>

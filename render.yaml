@@ -1,0 +1,13 @@
+# Render Blueprint — deploys the May Myanmar booking app as a web service.
+# In Render: New + → Blueprint → connect this repo → Apply.
+services:
+  - type: web
+    name: meimyanmar-bookings
+    runtime: node
+    plan: free
+    branch: claude/magical-pasteur-d84lsc
+    buildCommand: corepack enable && pnpm install && pnpm build
+    startCommand: pnpm start
+    envVars:
+      - key: NODE_VERSION
+        value: "22.11.0"
