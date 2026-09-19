@@ -8,8 +8,8 @@ Until then `book_studio.py` refuses to open the portal.
 
 | Item | Value |
 |---|---|
-| Login URL | |
-| Login method | password / OTP (which channel: SMS / email / app?) |
+| Login URL | https://iplus.sg |
+| Login method | OTP by SMS (never typed by the script; log in once with `--login`) |
 | Web portal exists? | yes / no (if **no**, stop: mobile-app only is out of scope) |
 | CAPTCHA anywhere? | yes / no (if **yes**, stop) |
 
