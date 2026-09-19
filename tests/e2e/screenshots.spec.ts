@@ -6,14 +6,20 @@ const OUT = path.join(process.cwd(), "data", "screenshots");
 test.describe("Screenshots for README", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  for (const name of ["dashboard", "compare", "pricing", "positioning", "vendor-alangkaar"]) {
-    test(name, async ({ page }) => {
+  for (const name of ["dashboard", "compare", "pricing", "positioning", "vendor-alangkaar", "focus", "focus-review"]) {
+    test(name, async ({ page, request }) => {
       const url =
         name === "dashboard"
           ? "/"
           : name === "vendor-alangkaar"
             ? "/vendor/alangkaar"
-            : `/${name}`;
+            : name === "focus-review"
+              ? "/focus/review"
+              : `/${name}`;
+      if (name.startsWith("focus")) {
+        // Starter tasks make the board worth looking at; 409 means it already has content.
+        await request.post("/api/focus/seed");
+      }
       await page.goto(url);
       await page.waitForLoadState("networkidle");
       // let framer-motion settle

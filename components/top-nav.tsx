@@ -11,6 +11,7 @@ const links = [
   { href: "/compare", label: "Compare" },
   { href: "/pricing", label: "Pricing" },
   { href: "/positioning", label: "Positioning" },
+  { href: "/focus", label: "Focus" },
 ];
 
 export function TopNav() {
