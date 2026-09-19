@@ -1,0 +1,7 @@
+{
+  "crons": [
+    { "path": "/api/focus/nudge?kind=morning&sync=1&send=1", "schedule": "30 23 * * *" },
+    { "path": "/api/focus/nudge?kind=midday&send=1", "schedule": "0 5 * * *" },
+    { "path": "/api/focus/nudge?kind=evening&send=1", "schedule": "30 10 * * *" }
+  ]
+}
