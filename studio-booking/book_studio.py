@@ -37,7 +37,7 @@ P = {  # portal map, see FLOW.md
     "slot": ".amenitydayslot .bookingSlot[data-link-start='{start}']", "start": "#bookingStartTime",
     "end": "#bookingEndTime", "submit": "#submit-button", "rows": "table.list-view-table tbody tr",
     "pay_boxes": ["dynamicmodel-ismanual", "dynamicmodel-isdepositebymanual", "dynamicmodel-termsandconditions"],
-    "proceed": "a.btnpaymentsubmit",
+    "proceed": "a.btnpaymentsubmit", "proceed_yes": "#customConfirm button.confirm-ok",
 }
 CAPTCHA = ["iframe[src*='recaptcha']", "iframe[src*='hcaptcha']", "iframe[src*='turnstile']", ".g-recaptcha"]
 
@@ -162,11 +162,13 @@ def book(page: Page, day: date, slot: str, confirm: bool) -> None:
     page.wait_for_url(lambda u: "/common/payment" in u, timeout=45_000)
     page.wait_for_load_state("networkidle")
     for box in P["pay_boxes"]:  # PayNow (manual) for fee and deposit, and the payment T&C, per Vin
-        page.click(f"label[for='{box}']")
+        page.locator(f"label[for='{box}']").dispatch_event("click")  # styled labels fail Playwright's visibility check
+        page.wait_for_timeout(500)
         if not page.locator(f"#{box}").is_checked():
             raise Stop(f"STOPPED: could not tick #{box} on the Payment page. Screenshot: {snap(page, 'payment-tick')}")
     log(f"Payment page: PayNow (manual) for fee and deposit ticked. Screenshot: {snap(page, 'payment-step')}")
     page.click(P["proceed"])
+    page.click(P["proceed_yes"], timeout=15_000)  # "Are you sure you want to proceed the booking?" -> Yes
     page.wait_for_url(lambda u: "/common/payment" not in u, timeout=45_000)
     page.wait_for_timeout(2000)
     shot = snap(page, "after-submit")
