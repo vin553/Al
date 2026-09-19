@@ -20,3 +20,9 @@ tsconfig.tsbuildinfo
 
 # Temple site — never commit real Stripe keys
 httpdocs/stripe-config.php
+
+# Studio booking automation - secrets, browser profile, logs
+studio-booking/.env
+studio-booking/profile/
+studio-booking/logs/
+studio-booking/.venv/
