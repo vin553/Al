@@ -36,6 +36,10 @@ Pricing, reach, breadth, and SWOT across six Singapore Indian wedding planners �
 
 ![Focus review](./data/screenshots/focus-review.png)
 
+**AI desk** — one prompt routed to Claude, ChatGPT, Gemini or Higgsfield, or all of them in council.
+
+![AI desk](./data/screenshots/focus-ai.png)
+
 ---
 
 ## Run it
@@ -102,6 +106,39 @@ Without the key, the SWOT API falls back to a deterministic, fact-referenced heu
 
 The tracker lives in its own SQLite file (`data/focus.db`, git-ignored, override with `FOCUS_DB_PATH`).
 
+### AI desk — multi-model routing
+
+`/focus/ai` sends one prompt to the model that fits the job, falls back when a key is missing, and logs every run against the task it was about.
+
+| Mode | Routes to | Fallback chain |
+| --- | --- | --- |
+| Plan my day, Break down a task, Draft | Claude | ChatGPT → Gemini |
+| Summarize | Gemini | Claude → ChatGPT |
+| Second opinion | ChatGPT | Gemini → Claude |
+| Council | every configured text model in parallel | merged by Claude, or the first configured model |
+| Creative | Claude writes a visual brief | Higgsfield renders it (skipped if not configured) |
+
+Every task row on the board has an "Ask AI" button that opens the desk with the task attached and Break down pre-selected. Plan mode injects the live board (overdue, due today, calendar) into the prompt automatically.
+
+**Configure** (any subset)
+
+| Variable | Default model | Enables |
+| --- | --- | --- |
+| `ANTHROPIC_API_KEY` (+ `ANTHROPIC_MODEL`) | `claude-opus-5` | Claude, with server-side refusal fallback on |
+| `OPENAI_API_KEY` (+ `OPENAI_MODEL`) | `gpt-5.6` | ChatGPT |
+| `GEMINI_API_KEY` (+ `GEMINI_MODEL`) | `gemini-3.8-flash` | Gemini |
+| `HIGGSFIELD_API_KEY_ID` + `HIGGSFIELD_API_KEY_SECRET` (+ `HIGGSFIELD_MODEL_PATH`) | `higgsfield-ai/soul/v2/standard` | Higgsfield text-to-image for Creative mode |
+
+With no key set, runs are still recorded with an honest "no text provider configured" error so the desk never fakes an answer. Higgsfield output links expire after seven days, so save what you want to keep.
+
+**API**
+
+| Route | Method | Purpose |
+| --- | --- | --- |
+| `/api/ai/run` | POST | `{mode, prompt, provider?, taskId?, context?}` → the recorded run |
+| `/api/ai/runs` | GET | Recent runs (`?task=`, `?limit=`) |
+| `/api/ai/providers` | GET | Which providers are configured and where each mode routes right now |
+
 ### Refresh research
 
 ```bash
@@ -127,15 +164,17 @@ app/               Next 14 App Router
  ├─ pricing/         Heatmap
  ├─ positioning/     2D scatter
  ├─ vendor/[slug]/   Dossier + SWOT
- ├─ focus/           Task board · focus/review/ digests + send log
+ ├─ focus/           Task board · focus/review/ digests + send log · focus/ai/ AI desk
  └─ api/
       ├─ vendors/         GET dataset
       ├─ swot/            GET per-vendor SWOT (Anthropic or heuristic)
       ├─ export-pdf/      GET streaming PDF (compare | vendor)
-      └─ focus/           tasks · report · nudge · sync · seed
+      ├─ focus/           tasks · report · nudge · sync · seed
+      └─ ai/              run · runs · providers
 components/        React UI (shadcn-style primitives + chart wrappers + focus/)
 lib/               db · vendor-types · swot · pdf · utils
                    focus-types · focus-db · nudge (pure engine) · notify · focus-sync · focus-ai
+ └─ ai/            types · providers (Claude, ChatGPT, Gemini, Higgsfield) · router · store
 data/
  ├─ vendors.seed.json   Committed research — source of truth
  ├─ vendors.db          SQLite (git-ignored, re-seeded on boot)
@@ -186,6 +225,7 @@ Three flows are covered end-to-end:
 | `charts.spec.ts`      | Heatmap table shape, positioning scatter renders 6 SVG points, `/api/export-pdf` returns a real PDF. |
 | `focus.spec.ts`       | Add, start, snooze, complete; KPI headline and groups follow; digest preview and send-log on `/focus/review`; API validation. |
 | `nudge-engine.spec.ts` | Pure engine: Singapore-time date helpers, classification, ranking, streaks, entity health, digest text, ICS parsing. |
+| `ai-router.spec.ts`   | Routing table, fallback chain, forced provider; API validation; offline run recorded honestly; task link pre-selects Break down. |
 
 A further spec (`screenshots.spec.ts`) captures every page for this README.
 

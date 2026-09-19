@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   AlarmClock,
+  Bot,
   CalendarDays,
   Check,
   ChevronRight,
@@ -191,6 +192,11 @@ export function FocusBoard({ initialTasks, initialReport, initialHistogram }: Pr
           <>
             <Button variant="outline" size="sm" onClick={sync} disabled={busy === "sync"}>
               <RefreshCw className={cn("h-3.5 w-3.5", busy === "sync" && "animate-spin")} /> Sync
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/focus/ai">
+                <Bot className="h-3.5 w-3.5" /> AI desk
+              </Link>
             </Button>
             <Button asChild size="sm">
               <Link href="/focus/review">
@@ -475,6 +481,11 @@ function TaskRow({
               <Play className="h-3.5 w-3.5" />
             </Button>
           ) : null}
+          <Button asChild variant="ghost" size="icon" className="h-8 w-8" title="Ask AI to break this down">
+            <Link href={`/focus/ai?task=${t.id}`} aria-label={`Ask AI about ${t.title}`}>
+              <Bot className="h-3.5 w-3.5" />
+            </Link>
+          </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Snooze ${t.title}`} title="Push to tomorrow (counts against you)" onClick={() => onPatch({ action: "snooze", days: 1 })}>
             <AlarmClock className="h-3.5 w-3.5" />
           </Button>
