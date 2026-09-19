@@ -26,3 +26,4 @@ studio-booking/.env
 studio-booking/profile/
 studio-booking/logs/
 studio-booking/.venv/
+__pycache__/
