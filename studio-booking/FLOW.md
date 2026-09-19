@@ -8,10 +8,10 @@ Until then `book_studio.py` refuses to open the portal.
 
 | Item | Value |
 |---|---|
-| Login URL | https://iplus.sg |
-| Login method | OTP by SMS (never typed by the script; log in once with `--login`) |
-| Web portal exists? | yes / no (if **no**, stop: mobile-app only is out of scope) |
-| CAPTCHA anywhere? | yes / no (if **yes**, stop) |
+| Login URL | https://app.iplusliving.com/site/login (linked from https://iplusliving.com; iplus.sg has no DNS record) |
+| Login method | Web form shows **Username + Password**. Vin's SMS OTP is the mobile app's login; confirm on the Mac whether the web login adds an OTP step after the password. |
+| Web portal exists? | **yes** (read-only check of the public login page on 2026-09-19) |
+| CAPTCHA anywhere? | Login form: none seen. Sign-up form has a "confirm you are not a bot" checkbox. If it also appears on login or booking, the script stops. |
 
 ## 1. Login page
 
