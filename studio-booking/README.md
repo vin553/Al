@@ -12,14 +12,18 @@ The exact page flow and selectors are in `FLOW.md` (discovered 2026-09-19 on the
 3. Opens Studio → Book Slot, moves the calendar to the target month, clicks the date, clicks the
    session button, and checks the start/end fields filled in.
 4. Screenshots the confirm step. In dry-run mode it stops here.
-5. With `--confirm` it clicks **Submit** once, then re-reads Booking History and prints the
-   booking code, status and fee due dates.
+5. With `--confirm` it clicks **Submit** once. That opens a Payment page with a 5-minute hold.
+   The script ticks *Manual Payment (PayNow)* for the booking fee and for the deposit, ticks
+   the payment terms, clicks **Proceed**, then re-reads Booking History and prints the booking
+   code, status and fee due dates.
 
 ## Read this before turning it on
 
-- **Payment is manual.** Submit creates a *Pending Approval / Awaiting Booking Fee* booking.
-  You must pay the booking fee (S$21.80) and deposit (S$200) yourself via the app before the
-  due date, or the portal cancels it ("cancelled by system due to unpaid booking fee").
+- **Payment is manual.** Proceed creates a *Pending Approval* booking with PayNow (manual)
+  selected. You must pay the booking fee (S$21.80) and deposit (S$200) by PayNow or at the
+  management office within 3 working days, or the portal cancels it ("cancelled by system due
+  to unpaid booking fee"). To use DBS PayLah! for the deposit instead, change `pay_boxes` in
+  `book_studio.py`; PayLah opens an online gateway the script does not complete.
 - **Portal rule: one Studio session per unit per calendar month.** A weekly schedule will be
   rejected by the portal after the first booking each month. The script reports the portal's
   message and exits; it never retries.

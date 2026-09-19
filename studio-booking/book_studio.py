@@ -4,7 +4,7 @@
 Guards (hard-coded, not configurable from the CLI):
   a) refuses if the slot starts < 72 h from now
   b) refuses if an active Studio booking already exists (prints it, never cancels it)
-  c) --dry-run is the default; the final Submit click only happens with --confirm
+  c) --dry-run is the default; Submit and the Payment page's Proceed only happen with --confirm
   d) any unexpected page or error -> screenshot to ./logs, print path, exit 1
 Selectors come from FLOW.md (discovered 2026-09-19).
 """
@@ -36,6 +36,8 @@ P = {  # portal map, see FLOW.md
     "cal_next": "button.fc-next-button", "day": "td.fc-day-number[data-date='{iso}']",
     "slot": ".amenitydayslot .bookingSlot[data-link-start='{start}']", "start": "#bookingStartTime",
     "end": "#bookingEndTime", "submit": "#submit-button", "rows": "table.list-view-table tbody tr",
+    "pay_boxes": ["dynamicmodel-ismanual", "dynamicmodel-isdepositebymanual", "dynamicmodel-termsandconditions"],
+    "proceed": "a.btnpaymentsubmit",
 }
 CAPTCHA = ["iframe[src*='recaptcha']", "iframe[src*='hcaptcha']", "iframe[src*='turnstile']", ".g-recaptcha"]
 
@@ -156,9 +158,16 @@ def book(page: Page, day: date, slot: str, confirm: bool) -> None:
     log(f"At confirm step: {day} {label} ({start} to {end}). Screenshot: {snap(page, 'confirm-step')}")
     if not confirm:
         raise Stop("DRY RUN: stopped before the Submit button. Re-run with --confirm to book.", 0)
-    page.click(P["submit"])  # the one and only booking attempt
-    page.wait_for_function("u => location.href !== u || document.querySelector('.modal.show, .modal.in')",
-                           arg=page.url, timeout=45_000)
+    page.click(P["submit"])  # the one and only booking attempt: Submit -> Payment page (5-minute hold)
+    page.wait_for_url(lambda u: "/common/payment" in u, timeout=45_000)
+    page.wait_for_load_state("networkidle")
+    for box in P["pay_boxes"]:  # PayNow (manual) for fee and deposit, and the payment T&C, per Vin
+        page.click(f"label[for='{box}']")
+        if not page.locator(f"#{box}").is_checked():
+            raise Stop(f"STOPPED: could not tick #{box} on the Payment page. Screenshot: {snap(page, 'payment-tick')}")
+    log(f"Payment page: PayNow (manual) for fee and deposit ticked. Screenshot: {snap(page, 'payment-step')}")
+    page.click(P["proceed"])
+    page.wait_for_url(lambda u: "/common/payment" not in u, timeout=45_000)
     page.wait_for_timeout(2000)
     shot = snap(page, "after-submit")
     mine = [r for r in bookings(page, day, STUDIO_ID) if r[3].startswith(day.strftime("%d %b %y"))]
@@ -166,7 +175,7 @@ def book(page: Page, day: date, slot: str, confirm: bool) -> None:
         raise Stop(f"Submit clicked but no Studio booking for {day} appears in Booking History. Check {shot}")
     r = mine[0]
     log(f"BOOKED  date={day}  slot={label}  reference={r[0]}  status={r[5]}  fee-due={r[6]}  deposit-due={r[7]}  screenshot={shot}")
-    log("Pay the booking fee (S$21.80) and deposit (S$200) via the app before the due date or the portal auto-cancels.")
+    log("Pay the booking fee (S$21.80) and deposit (S$200) by PayNow / at the management office within 3 working days.")
 
 
 def parse_args() -> argparse.Namespace:
