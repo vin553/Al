@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""book_studio.py - book the condo studio room on iPlus. One slot, one attempt, no retries.
+"""book_studio.py - book the condo Studio on iPlus (app.iplusliving.com). One slot, one attempt, no retries.
 
 Guards (hard-coded, not configurable from the CLI):
   a) refuses if the slot starts < 72 h from now
-  b) refuses if an active booking already exists (prints it, never cancels it)
-  c) --dry-run is the default; the final confirm click only happens with --confirm
+  b) refuses if an active Studio booking already exists (prints it, never cancels it)
+  c) --dry-run is the default; the final Submit click only happens with --confirm
   d) any unexpected page or error -> screenshot to ./logs, print path, exit 1
+Selectors come from FLOW.md (discovered 2026-09-19).
 """
 import argparse
+import json
 import os
 import sys
 from datetime import date, datetime, timedelta
@@ -22,36 +24,23 @@ load_dotenv(HERE / ".env")
 SGT = ZoneInfo("Asia/Singapore")
 LOGS, PROFILE = HERE / "logs", HERE / "profile"
 MIN_LEAD = timedelta(hours=72)
-SLOTS = {"morning": (9, "9am-3pm"), "evening": (16, "4pm-10pm")}
-DISCOVERY_DONE = False  # flip to True only after FLOW.md is verified and PORTAL is filled in
-
-# ---- Portal map. Every value comes from FLOW.md (Step 0). Placeholders are empty. ----
-PORTAL = {
-    "login_url": os.getenv("IPLUS_URL", ""),
-    "login_user": "",            # selector: username field
-    "login_pass": "",            # selector: password field (ignored for OTP)
-    "login_submit": "",          # selector: login button
-    "logged_in": "",             # selector visible only when logged in (e.g. logout link)
-    "bookings_url": "",          # "My bookings" page
-    "bookings_page": "",         # selector proving we are on the bookings page
-    "active_rows": "",           # selector: one element per active/upcoming booking
-    "studio_url": "",            # facility booking -> studio room page
-    "date_mode": "input",        # "input" (type into a field) or "click" (calendar cell)
-    "date_input": "",            # selector for the date field   (date_mode=input)
-    "date_format": "%d/%m/%Y",   # strftime format the field expects (date_mode=input)
-    "day_cell": "",              # selector template with {day}, {iso} (date_mode=click)
-    "slot": {"morning": "", "evening": ""},  # selector per slot button/radio
-    "confirm": "",               # the FINAL confirm button
-    "success": "",               # selector visible after a successful booking
-    "booking_ref": "",           # selector containing the booking reference (optional)
+SLOTS = {"morning": (9, 15, "9am-3pm"), "evening": (16, 22, "4pm-10pm")}
+BASE = os.getenv("IPLUS_BASE", "https://app.iplusliving.com")
+STUDIO_ID = "9acefacd-7661-11f0-b5f8-06f0d5b3a6c5"  # the Studio's amenity id on iPlus (FLOW.md)
+ACTIVE = {"Pending Approval", "Booking Confirmed", "Awaiting Booking Fee", "Awaiting Deposit"}
+P = {  # portal map, see FLOW.md
+    "login_url": BASE + "/site/login", "user": "#user-username", "pass": "#user-password",
+    "login_btn": "input[name='login-button']", "modal_ok": "button.button-fill-primary-large:visible",
+    "logged_in": "button.btnLogout", "bookings_api": BASE + "/amenity/amenitiesbokking",
+    "book_url": BASE + f"/amenity/amenitybooking?amenity={STUDIO_ID}", "cal_title": "#calendar h2",
+    "cal_next": "button.fc-next-button", "day": "td.fc-day-number[data-date='{iso}']",
+    "slot": ".amenitydayslot .bookingSlot[data-link-start='{start}']", "start": "#bookingStartTime",
+    "end": "#bookingEndTime", "submit": "#submit-button", "rows": "table.list-view-table tbody tr",
 }
-CAPTCHA_HINTS = ["iframe[src*='recaptcha']", "iframe[src*='hcaptcha']", "iframe[src*='turnstile']",
-                 ".g-recaptcha", "#captcha", "input[name*='captcha']"]
+CAPTCHA = ["iframe[src*='recaptcha']", "iframe[src*='hcaptcha']", "iframe[src*='turnstile']", ".g-recaptcha"]
 
 
 class Stop(Exception):
-    """Controlled stop: message is printed, exit code carried."""
-
     def __init__(self, msg: str, code: int = 1):
         super().__init__(msg)
         self.code = code
@@ -77,95 +66,117 @@ def slot_start(day: date, slot: str) -> datetime:
 
 
 def guard_lead_time(start: datetime, now: datetime) -> None:
-    lead = start - now
-    if lead < MIN_LEAD:
-        raise Stop(f"REFUSED: slot starts in {lead} (< 72 h). Nothing was booked.", 2)
-
-
-def guard_discovery() -> None:
-    required = [k for k in ("login_url", "logged_in", "bookings_url", "bookings_page", "active_rows",
-                            "studio_url", "confirm", "success") if not PORTAL[k]]
-    if not DISCOVERY_DONE or required or not all(PORTAL["slot"].values()):
-        raise Stop("REFUSED: Step 0 discovery not complete. Run discover.py, fill FLOW.md, then fill "
-                   f"PORTAL in this file and set DISCOVERY_DONE = True. Missing: {required}", 2)
+    if start - now < MIN_LEAD:
+        raise Stop(f"REFUSED: slot starts in {start - now} (< 72 h). Nothing was booked.", 2)
 
 
 def check_captcha(page: Page) -> None:
-    for sel in CAPTCHA_HINTS:
-        if page.locator(sel).count():
-            raise Stop(f"STOPPED: CAPTCHA detected ({sel}). Not attempting to bypass it. "
-                       f"Screenshot: {snap(page, 'captcha')}")
+    for sel in CAPTCHA:
+        if page.locator(f"{sel}:visible").count():  # hidden widgets (sign-up form) are ignored
+            raise Stop(f"STOPPED: CAPTCHA visible ({sel}). Not bypassing it. Screenshot: {snap(page, 'captcha')}")
 
 
 def ensure_logged_in(page: Page) -> None:
-    page.goto(PORTAL["login_url"], wait_until="domcontentloaded")
-    check_captcha(page)
-    if page.locator(PORTAL["logged_in"]).count():
-        log("Already logged in (persistent profile).")
-        return
-    auth = os.getenv("IPLUS_AUTH", "otp").lower()
-    if auth == "password":
-        page.fill(PORTAL["login_user"], os.environ["IPLUS_USERNAME"])
-        page.fill(PORTAL["login_pass"], os.environ["IPLUS_PASSWORD"])
-        page.click(PORTAL["login_submit"])
-    elif sys.stdin.isatty():
-        log("OTP login: complete it in the browser window. Waiting up to 5 minutes...")
-    else:
-        raise Stop(f"STOPPED: not logged in and OTP needs a human. Run `python3 book_studio.py --login` "
-                   f"once, interactively. Screenshot: {snap(page, 'login-needed')}")
-    page.locator(PORTAL["logged_in"]).first.wait_for(timeout=300_000 if auth != "password" else 30_000)
-    check_captcha(page)
+    page.goto(P["login_url"], wait_until="domcontentloaded")
+    if page.locator(P["user"]).count():
+        try:  # "Your session has expired, please login again." popup, injected ~1 s after load
+            page.locator(P["modal_ok"]).filter(has_text="Ok").first.click(timeout=4_000)
+        except Exception:
+            pass
+        check_captcha(page)
+        page.fill(P["user"], os.environ["IPLUS_USERNAME"])
+        page.fill(P["pass"], os.environ["IPLUS_PASSWORD"])
+        page.click(P["login_btn"])
+        page.wait_for_url(lambda u: "/site/login" not in u, timeout=30_000)
+        page.wait_for_load_state("networkidle")
+    if not page.locator(P["logged_in"]).count():
+        raise Stop(f"STOPPED: login did not succeed. Screenshot: {snap(page, 'login-failed')}")
     log("Logged in.")
 
 
-def guard_existing_booking(page: Page) -> None:
-    page.goto(PORTAL["bookings_url"], wait_until="networkidle")
+def bookings(page: Page, day: date, amenity: str | None) -> list[list[str]]:
+    """Rows of the Booking History list (the portal's own list endpoint), upcoming bookings only."""
+    params = {"status": "", "fromfaclity": 1, "pageIndex": 1, "sort": "-created",
+              "requestBookingStartTime": day.strftime("%d %b '%y"),
+              "requestBookingEndTime": (day + timedelta(days=35)).strftime("%d %b '%y")}
+    if amenity:
+        params["amenityId"] = amenity
+    data = json.loads(page.request.get(P["bookings_api"], params=params).text())
+    if str(data.get("Status")) != "200":
+        raise Stop(f"STOPPED: booking list returned status {data.get('Status')!r}; not proceeding.")
+    tmp = page.context.new_page()
+    tmp.set_content(data["html"])
+    rows = [[" ".join(c.split()) for c in r.locator("td").all_inner_texts()] for r in tmp.locator(P["rows"]).all()]
+    tmp.close()
+    if not rows:
+        raise Stop("STOPPED: booking list has no table; page layout may have changed. Not proceeding.")
+    return [r for r in rows if len(r) >= 6]  # drops the "No result found" row
+
+
+def guard_existing_booking(page: Page, today: date) -> None:
+    others = [r for r in bookings(page, today, None) if r[5] in ACTIVE]
+    for r in others:
+        log(f"  info: other upcoming booking  {r[0]}  {r[1]}  {r[3]} - {r[4]}  [{r[5]}]")
+    active = [r for r in bookings(page, today, STUDIO_ID) if r[5] in ACTIVE]
+    if active:
+        lines = "\n".join(f"  {r[0]}  {r[1]}  {r[3]} - {r[4]}  [{r[5]}]" for r in active)
+        raise Stop(f"EXISTING STUDIO BOOKING FOUND - not booking, not cancelling:\n{lines}", 0)
+    log("No active Studio booking found.")
+
+
+def open_day(page: Page, day: date) -> None:
+    page.goto(P["book_url"], wait_until="domcontentloaded")
+    page.wait_for_selector(P["cal_title"])
     check_captcha(page)
-    page.locator(PORTAL["bookings_page"]).first.wait_for(state="attached", timeout=15_000)  # fail closed
-    rows = page.locator(PORTAL["active_rows"])
-    if rows.count():
-        details = " | ".join(" ".join(t.split()) for t in rows.all_inner_texts())
-        snap(page, "existing-booking")
-        raise Stop(f"EXISTING BOOKING FOUND - not booking, not cancelling:\n  {details}", 0)
-    log("No active booking found.")
-
-
-def select_date(page: Page, day: date) -> None:
-    if PORTAL["date_mode"] == "input":
-        page.fill(PORTAL["date_input"], day.strftime(PORTAL["date_format"]))
-        page.keyboard.press("Enter")
-    else:
-        page.click(PORTAL["day_cell"].format(day=day.day, iso=day.isoformat()))
+    for _ in range(2):  # bookings open at most 4 weeks ahead, so at most one month forward
+        if day.strftime("%B %Y") in page.locator(P["cal_title"]).inner_text():
+            break
+        page.click(P["cal_next"])
+        page.wait_for_timeout(1500)
+    cell = page.locator(P["day"].format(iso=day.isoformat()))
+    cls = cell.get_attribute("class") or ""
+    if "not_available" in cls or "grayColour" in cls:
+        raise Stop(f"REFUSED: portal marks {day} as not bookable (class '{cls}'). Screenshot: {snap(page, 'day-unavailable')}")
+    cell.click()
+    page.wait_for_selector(".amenitydayslot .bookingSlot", timeout=15_000)
 
 
 def book(page: Page, day: date, slot: str, confirm: bool) -> None:
-    page.goto(PORTAL["studio_url"], wait_until="networkidle")
-    check_captcha(page)
-    select_date(page, day)
-    page.click(PORTAL["slot"][slot])
-    button = page.locator(PORTAL["confirm"]).first
-    button.wait_for(timeout=15_000)
-    shot = snap(page, "confirm-step")
-    log(f"At confirm step for {day} {SLOTS[slot][1]}. Screenshot: {shot}")
+    h0, h1, label = SLOTS[slot]
+    start, end = f"{day} {h0:02d}:00:00", f"{day} {h1:02d}:00:00"
+    open_day(page, day)
+    button = page.locator(P["slot"].format(start=start))
+    if not button.count():
+        raise Stop(f"REFUSED: slot {label} on {day} is not offered. Screenshot: {snap(page, 'slot-missing')}")
+    button.click()
+    page.wait_for_timeout(1500)
+    got = (page.locator(P["start"]).input_value(), page.locator(P["end"]).input_value())
+    if got != (start, end):
+        raise Stop(f"STOPPED: slot did not select (got {got}). Screenshot: {snap(page, 'slot-not-selected')}")
+    log(f"At confirm step: {day} {label} ({start} to {end}). Screenshot: {snap(page, 'confirm-step')}")
     if not confirm:
-        raise Stop("DRY RUN: stopped before the final confirm button. Re-run with --confirm to book.", 0)
-    button.click()  # the one and only booking attempt
-    page.locator(PORTAL["success"]).first.wait_for(timeout=30_000)
-    ref = ""
-    if PORTAL["booking_ref"] and page.locator(PORTAL["booking_ref"]).count():
-        ref = " ".join(page.locator(PORTAL["booking_ref"]).first.inner_text().split())
-    shot = snap(page, "booked")
-    log(f"BOOKED  date={day}  slot={SLOTS[slot][1]}  reference={ref or 'n/a'}  screenshot={shot}")
+        raise Stop("DRY RUN: stopped before the Submit button. Re-run with --confirm to book.", 0)
+    page.click(P["submit"])  # the one and only booking attempt
+    page.wait_for_function("u => location.href !== u || document.querySelector('.modal.show, .modal.in')",
+                           arg=page.url, timeout=45_000)
+    page.wait_for_timeout(2000)
+    shot = snap(page, "after-submit")
+    mine = [r for r in bookings(page, day, STUDIO_ID) if r[3].startswith(day.strftime("%d %b %y"))]
+    if not mine:
+        raise Stop(f"Submit clicked but no Studio booking for {day} appears in Booking History. Check {shot}")
+    r = mine[0]
+    log(f"BOOKED  date={day}  slot={label}  reference={r[0]}  status={r[5]}  fee-due={r[6]}  deposit-due={r[7]}  screenshot={shot}")
+    log("Pay the booking fee (S$21.80) and deposit (S$200) via the app before the due date or the portal auto-cancels.")
 
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--date", type=date.fromisoformat, default=None, help="YYYY-MM-DD (default: next Saturday)")
     p.add_argument("--slot", choices=SLOTS, default="evening", help="morning=9am-3pm, evening=4pm-10pm")
-    p.add_argument("--dry-run", action="store_true", help="stop before the confirm button (default)")
-    p.add_argument("--confirm", action="store_true", help="actually click the final confirm button")
-    p.add_argument("--login", action="store_true", help="only open the portal and log in, then exit")
-    p.add_argument("--headless", action="store_true", help="no browser window (scheduled runs only)")
+    p.add_argument("--dry-run", action="store_true", help="stop before the Submit button (default)")
+    p.add_argument("--confirm", action="store_true", help="actually click Submit")
+    p.add_argument("--login", action="store_true", help="only log in to check the credentials, then exit")
+    p.add_argument("--headless", action="store_true", help="no browser window (scheduled runs)")
     return p.parse_args()
 
 
@@ -174,9 +185,8 @@ def main() -> int:
     now = datetime.now(SGT)
     day = args.date or next_saturday(now.date())
     confirm = args.confirm and not args.dry_run
-    log(f"Target: {day} ({day:%A}) {SLOTS[args.slot][1]}  mode={'CONFIRM' if confirm else 'DRY RUN'}")
+    log(f"Target: {day} ({day:%A}) {SLOTS[args.slot][2]}  mode={'CONFIRM' if confirm else 'DRY RUN'}")
     try:
-        guard_discovery()
         if not args.login:
             guard_lead_time(slot_start(day, args.slot), now)
     except Stop as s:
@@ -191,8 +201,8 @@ def main() -> int:
             page.set_default_timeout(20_000)
             ensure_logged_in(page)
             if args.login:
-                raise Stop("Login saved to the persistent profile. Done.", 0)
-            guard_existing_booking(page)
+                raise Stop("Login OK. Done.", 0)
+            guard_existing_booking(page, now.date())
             book(page, day, args.slot, confirm)
             return 0
         except Stop as s:

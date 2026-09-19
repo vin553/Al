@@ -1,83 +1,77 @@
-# Studio room auto-booking (iPlus)
+# Studio auto-booking (iPlus Living, Piccadilly Grand)
 
-Books **one** weekly studio-room slot on the condo's iPlus resident portal using
-Playwright with a persistent browser profile (log in once, stay logged in).
+Books **one** Studio session on the condo's iPlus web portal (app.iplusliving.com) with
+Playwright. Default target: next Saturday, evening session (4pm–10pm), Singapore time.
 
-**Current status: Step 0 (discovery) is not done.** `book_studio.py` refuses to open the
-portal until the selectors in `FLOW.md` are copied into `PORTAL` at the top of the script
-and `DISCOVERY_DONE` is set to `True`. Everything else is built and tested against a
-fake portal.
+The exact page flow and selectors are in `FLOW.md` (discovered 2026-09-19 on the live portal).
 
 ## What it does
 
-`book_studio.py` opens iPlus in Chromium, checks "My bookings", goes to the studio room
-page, selects the date and slot, screenshots the confirm step, and either stops there
-(dry run, the default) or clicks confirm once and prints the booking reference.
+1. Opens the login page, dismisses the "session expired" popup, logs in with username + password.
+2. Reads Booking History for upcoming bookings. Any active **Studio** booking stops the run.
+3. Opens Studio → Book Slot, moves the calendar to the target month, clicks the date, clicks the
+   session button, and checks the start/end fields filled in.
+4. Screenshots the confirm step. In dry-run mode it stops here.
+5. With `--confirm` it clicks **Submit** once, then re-reads Booking History and prints the
+   booking code, status and fee due dates.
 
-Defaults: next Saturday, evening slot (4pm–10pm). Times are Asia/Singapore.
+## Read this before turning it on
+
+- **Payment is manual.** Submit creates a *Pending Approval / Awaiting Booking Fee* booking.
+  You must pay the booking fee (S$21.80) and deposit (S$200) yourself via the app before the
+  due date, or the portal cancels it ("cancelled by system due to unpaid booking fee").
+- **Portal rule: one Studio session per unit per calendar month.** A weekly schedule will be
+  rejected by the portal after the first booking each month. The script reports the portal's
+  message and exits; it never retries.
+- **Bookings open 4 weeks ahead**, and the portal greys out today plus the next 3 days.
+- **Cancellations** must be made at least 1 week before the booked date (condo rule).
 
 ## Guards (hard-coded, cannot be turned off from the command line)
 
 | Guard | Behaviour |
 |---|---|
-| 72 hours | Refuses if the slot starts less than 72 h from now. Exit code 2. |
-| One booking | Reads "My bookings" first. If any active booking exists it prints it and exits 0. It never cancels anything. If that page cannot be read, it stops instead of assuming. |
-| Dry run by default | Only `--confirm` clicks the final button. `--dry-run` overrides `--confirm` if both are given. |
+| 72 hours | Refuses if the session starts less than 72 h from now. Exit 2. No browser is opened. |
+| One booking | Reads Booking History (all statuses, upcoming dates). If an active Studio booking exists it prints it and exits 0. It never cancels anything. Other facilities' bookings are printed as info only. If the list cannot be read, it stops instead of assuming. |
+| Dry run by default | Only `--confirm` clicks Submit. `--dry-run` overrides `--confirm` if both are given. |
 | No retries | One attempt per run. Any unexpected page, timeout, or missing element saves a screenshot to `logs/`, prints the path, and exits 1. |
-| CAPTCHA | If a reCAPTCHA, hCaptcha, or Turnstile widget appears, it stops and tells you. No bypass. |
-| OTP | Never typed by the script. Log in once yourself with `--login`; the profile keeps the session. |
+| CAPTCHA | Stops if a *visible* reCAPTCHA, hCaptcha, or Turnstile widget appears. (The hidden one inside the Sign Up form is ignored.) |
+| Unbookable date | Stops if the portal marks the date unavailable, or the session button is missing, or the start/end fields did not fill in. |
 
-## Setup (on your Mac)
+## Setup
 
 ```bash
 cd studio-booking
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 playwright install chromium
-cp .env.example .env        # then fill in IPLUS_URL, IPLUS_USERNAME, IPLUS_AUTH
+cp .env.example .env        # fill in IPLUS_USERNAME and IPLUS_PASSWORD
 ```
 
 `.env`, `profile/` and `logs/` are git-ignored. Never commit them.
 
-## Step 0: discovery (do this first, once)
-
-```bash
-python3 discover.py
-```
-
-A headed browser opens on the login URL with the Playwright Inspector beside it.
-Log in yourself (password or OTP), go to facility booking, then studio room, choose a
-date and a slot, and stop **before** the confirm button. Use the Inspector's
-*Pick locator* to read selectors. Every page you visit is saved to `logs/discovery/`
-as a screenshot and HTML, plus a trace you can replay with
-`playwright show-trace logs/discovery/trace.zip`.
-
-Then fill in `FLOW.md`, copy the selectors into `PORTAL` in `book_studio.py`, and set
-`DISCOVERY_DONE = True`. If iPlus turns out to be app-only with no web portal, stop
-here; the app and its API are out of scope.
-
 ## Run manually
 
 ```bash
-python3 book_studio.py --login                       # once: log in (OTP ok), save session
-python3 book_studio.py                               # dry run, next Saturday evening
+python3 book_studio.py --login                            # just log in and check the credentials
+python3 book_studio.py                                    # dry run, next Saturday evening
 python3 book_studio.py --date 2026-10-03 --slot morning   # dry run, specific date/slot
-python3 book_studio.py --confirm                     # actually book
+python3 book_studio.py --confirm                          # actually book
 ```
 
-Every run prints a timestamped log line per step and the path of each screenshot.
+Each run prints one timestamped line per step and the path of every screenshot.
+`--headless` hides the browser window (used by the scheduler).
 
 ## Change the slot or day
 
-- Slot: pass `--slot morning` or `--slot evening`. For the scheduled job, add the flag in
-  `run.sh` on the `book_studio.py --confirm` line.
+- Session: `--slot morning` (9am–3pm) or `--slot evening` (4pm–10pm). For the scheduled job,
+  add the flag on the `book_studio.py --confirm` line in `run.sh`.
 - Day: the default is next Saturday, computed in `next_saturday()` in `book_studio.py`.
-  Change the `5` (Monday=0) to another weekday, or pass `--date` for a one-off.
-- Slot hours: the `SLOTS` table at the top of `book_studio.py` holds the start hour and label.
+  Change the `5` (Monday = 0) for another weekday, or pass `--date` for a one-off.
+- Session hours live in the `SLOTS` table at the top of `book_studio.py`.
 
 ## Schedule (every Sunday 10:00 Asia/Singapore)
 
-`run.sh` runs one `--confirm` attempt and appends everything to `logs/YYYY-MM-DD.txt`.
+`run.sh` runs one `--confirm --headless` attempt and appends to `logs/YYYY-MM-DD.txt`.
 
 **macOS (launchd)**
 
@@ -89,9 +83,8 @@ launchctl load ~/Library/LaunchAgents/com.alangkaar.studio-booking.plist
 launchctl list | grep studio-booking        # should show the label
 ```
 
-launchd fires on the Mac's local clock, so keep the Mac's time zone on Singapore. The
-Mac must be awake and logged in at 10:00 on Sunday (Energy Saver, or `caffeinate`), and
-the job opens a visible browser window in your session.
+launchd fires on the Mac's local clock, so keep the Mac's time zone on Singapore, awake and
+logged in at 10:00 on Sunday (Energy Saver, or `caffeinate`).
 
 **Linux (cron)**: paste `scheduling/crontab.txt` into `crontab -e` after replacing the path.
 
@@ -101,7 +94,7 @@ the job opens a visible browser window in your session.
 ls -t logs/*.txt | head -1 | xargs tail -n 30
 ```
 
-Look for `BOOKED`, `EXISTING BOOKING FOUND`, `REFUSED`, `STOPPED`, or `ERROR`.
+Look for `BOOKED`, `EXISTING STUDIO BOOKING FOUND`, `REFUSED`, `STOPPED`, `DRY RUN` or `ERROR`.
 Screenshots from that run sit next to it in `logs/` with the same date prefix.
 
 **Turn it off**
@@ -117,9 +110,9 @@ To remove it completely on macOS, also delete the plist from `~/Library/LaunchAg
 
 | File | Purpose |
 |---|---|
-| `book_studio.py` | The booking script (about 210 lines) |
-| `discover.py` | Step 0 helper: headed browser, records pages and a trace |
-| `FLOW.md` | The discovered page flow and selectors (template until Step 0) |
+| `book_studio.py` | The booking script (about 220 lines) |
+| `discover.py` | Headed discovery helper; records every page and a trace (used for FLOW.md) |
+| `FLOW.md` | The discovered page flow, selectors and portal rules |
 | `run.sh` | Scheduler wrapper, writes `logs/YYYY-MM-DD.txt` |
 | `scheduling/` | launchd plist and crontab line |
 | `.env.example` | Credential template; copy to `.env` |

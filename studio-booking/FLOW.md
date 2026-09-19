@@ -1,62 +1,74 @@
 # iPlus studio room — discovered booking flow
 
-**Status: NOT YET DISCOVERED.** Fill this in from a `discover.py` run, then copy the
-selectors into `PORTAL` in `book_studio.py` and set `DISCOVERY_DONE = True`.
-Until then `book_studio.py` refuses to open the portal.
+**Status: DISCOVERED on 2026-09-19** against the live portal, logged in as Vin, stopping before
+the Submit button. Nothing was booked. Screenshots and saved HTML of every page are in
+`logs/discovery/` (git-ignored, on the machine that ran discovery).
 
 ## 0. Access
 
 | Item | Value |
 |---|---|
-| Login URL | https://app.iplusliving.com/site/login (linked from https://iplusliving.com; iplus.sg has no DNS record) |
-| Login method | Web form shows **Username + Password**. Vin's SMS OTP is the mobile app's login; confirm on the Mac whether the web login adds an OTP step after the password. |
-| Web portal exists? | **yes** (read-only check of the public login page on 2026-09-19) |
-| CAPTCHA anywhere? | Login form: none seen. Sign-up form has a "confirm you are not a bot" checkbox. If it also appears on login or booking, the script stops. |
+| Portal | https://app.iplusliving.com (linked from iplusliving.com). `iplus.sg` has no DNS record. |
+| Login URL | https://app.iplusliving.com/site/login |
+| Login method | **Username + password** on the web. Vin's SMS OTP is the mobile app's login only. |
+| Session persistence | The session cookie is **not** kept across browser restarts, and the login page shows a "Your session has expired, please login again." popup with an **Ok** button on the next visit. The script dismisses it and logs in with the password every run. |
+| CAPTCHA | Login form: **none**. A reCAPTCHA v2 checkbox exists on the page but only inside the hidden Sign Up form. Booking form: **none**. The script still stops if a *visible* CAPTCHA widget ever appears. |
+| Condo | Piccadilly Grand, Unit Block 05 #20-16 |
 
-## 1. Login page
+## 1. Login page (`/site/login`)
 
-| Item | Selector / note |
+| Item | Selector |
 |---|---|
-| Username field | |
-| Password field | |
-| Submit button | |
-| Element visible only when logged in (e.g. Logout link) | |
+| Username field | `#user-username` (`User[username]`) |
+| Password field | `#user-password` (`User[password]`) |
+| Submit button | `input[name='login-button']` (text "Login") |
+| Expired-session popup | `button.button-fill-primary-large` with text "Ok" (appears about 1 s after load) |
+| Logged-in marker | `button.btnLogout` (in the profile menu; present in the DOM once logged in) |
+| After login | Redirects to `/` ("Wall"). Left menu: Service Request, **Facilities** (`/amenity/index`), Wall, Documents, Online Forms, Units, Polls, Visitors, Packages. |
 
-## 2. My bookings page
+## 2. Existing bookings
 
-| Item | Selector / note |
+| Item | Value |
 |---|---|
-| URL | |
-| Element proving we are on this page | |
-| One element per active/upcoming booking | |
-| What the page shows when a booking exists (exact text) | |
-| What it shows when there are none (exact text) | |
+| Page | Facilities → **Booking History** tab (`a.wallTypeList` "Booking History") |
+| Default filter | Status = "Approval / Fee / Deposit Collection" (value 99), which **hides confirmed bookings**. "View All Status" = empty value. |
+| List endpoint the tab uses | `GET /amenity/amenitiesbokking?status=&fromfaclity=1&pageIndex=1&sort=-created` → JSON `{"Status":"200","html":"<table class=list-view-table>…"}`, 10 rows per page. Optional filters: `amenityId=<facility id>`, `requestBookingStartTime` / `requestBookingEndTime` in the format `19 Sep '26` (ISO dates are ignored). |
+| Row columns | Booking code, Facility, Unit, Booking From, Booking Till, Status, Booking Fee Due Date, Deposit Due Date, Requested On, Facility Access Time, Remark, Unit Quota Skipped, Actions |
+| Status values | Pending Approval (1), Booking Confirmed (2), Booking Rejected (3), Booking Cancelled (4), Awaiting Booking Fee (5), Awaiting Deposit (6), Complete (8), Deposit not Refunded (199) |
+| Empty state | One row: `No result found` |
+| Example active row | `SAB01515287 | Gourmet Grill Pavilion | #20-16 | 22 Sep 26 04:00 PM | 22 Sep 26 10:00 PM | Booking Confirmed | - | - | 15 Sep 26 06:36:24 AM | …` |
+| Studio bookings on file | none (as of discovery) |
+| Booking detail page | `/amenity/amenityaudittrial?booking=<id>` (booking number, slot, fees, payment transactions, status history) |
 
-## 3. Studio room page
+## 3. Studio room
 
-| Item | Selector / note |
+| Item | Value |
 |---|---|
-| Path from home (menu clicks, in order) | |
-| Direct URL (if any) | |
-| Date picker type | text input (format: `DD/MM/YYYY`?) / calendar cell |
-| Date input selector, or day-cell selector template | |
-| Slot label as shown on the page: morning | e.g. `9am–3pm` |
-| Slot label as shown on the page: evening | e.g. `4pm–10pm` |
-| Slot button/radio selector: morning | |
-| Slot button/radio selector: evening | |
-| How far ahead bookings open | e.g. 14 days |
-| Any minimum notice enforced by the portal | |
+| Facility list | `/amenity/index`, link text **Studio** → `/amenity/amenitiesdetail?amenity=9acefacd-7661-11f0-b5f8-06f0d5b3a6c5` |
+| Studio id | `9acefacd-7661-11f0-b5f8-06f0d5b3a6c5` |
+| Book Now | `a.book-btn` → `/amenity/amenitybooking?amenity=9acefacd-7661-11f0-b5f8-06f0d5b3a6c5` (page title "Studio", heading "Book Slot") |
+| Fees shown | Booking fee S$21.80 flat (S$20 + GST, non-refundable), deposit S$200.00 (refundable) |
+| Sessions | Session 1 **0900–1500**, Session 2 **1600–2200**, daily |
+| How far ahead | Up to **4 weeks** in advance. Today and the next 3 days are greyed out (`css_not_available`/`grayColour`), so the portal itself enforces roughly a 72 h minimum. |
+| Portal rule | **Each unit may book one (1) Studio session per calendar month.** Booking fee must be paid by the due date or the booking is auto-cancelled ("Your booking cancelled by system due to unpaid booking fee" seen in history). Cancellation must be at least 1 week before. |
 
-## 4. Confirm step
+## 4. Book Slot page (`/amenity/amenitybooking?amenity=<id>`)
 
-| Item | Selector / note |
+| Item | Selector / behaviour |
 |---|---|
-| Final confirm button (the click that books) | |
-| Any intermediate "Next"/"Review" buttons before it | |
-| Success indicator after booking | |
-| Booking reference element | |
-| Screenshot of the confirm step | `logs/discovery/NN.png` |
+| Calendar | FullCalendar in `#calendar`; month title `#calendar h2` ("September 2026"); `button.fc-next-button` / `button.fc-prev-button` |
+| Day cell | `td.fc-day-number[data-date='YYYY-MM-DD']`. Classes: `css_fully_available` (green, bookable), `css_not_available`/`css_not_available1 grayColour` (not bookable), fully-booked days are red per the legend. |
+| Day click | POSTs `/amenity/amenitygetslot` and renders slot buttons into `.amenitydayslot` |
+| Slot buttons | `.amenitydayslot .bookingSlot` with `data-link-start="2026-09-26 16:00:00"` and `data-link-end="2026-09-26 22:00:00"`; visible text **"09:00 AM"** and **"04:00 PM"** |
+| Slot click | Fills the hidden selects `#bookingStartTime` (value `2026-09-26 16:00:00`, shows "04:00 PM") and `#bookingEndTime` (value `2026-09-26 22:00:00`, shows "10:00 PM"); the clicked button turns green |
+| Notes field | `#dynamicmodel-requestnote` (optional) |
+| **Final confirm** | `#submit-button` ("Submit", top right). Its handler validates start/end, then POSTs `/amenity/amenitybookingadd` and on success redirects (`window.location = backurl`) to a payment page. The security-PIN modal (`#modalSecurityPin`) is only used for on-behalf bookings, not for Vin. |
+| After submit | **Not exercised** during discovery. Expected: a new row appears in Booking History with status Pending Approval / Awaiting Booking Fee, and the fee + deposit must be paid manually (PayNow / PayLah) before the due date. The script verifies success by re-reading the booking list for the Studio on the target date and prints the booking code and due dates. |
+| Dry-run screenshot | `logs/discovery/09-evening-selected.png` (26 Sep 2026, 04:00 PM–10:00 PM selected, Submit not clicked) |
 
 ## 5. Notes
 
-- Anything unexpected (pop-ups, T&C checkboxes, payment step, quota message).
+- Booking History shows many prior bookings for other facilities under the same unit, so the
+  existing-booking guard is **Studio-specific** (it also prints any other upcoming bookings).
+- A visible "Your session has expired" popup on the login page is normal and is dismissed.
+- Discovery ran headed under a virtual display in a cloud container, not on Vin's Mac.

@@ -9,6 +9,6 @@ export TZ=Asia/Singapore
 LOG="logs/$(date +%F).txt"
 {
   echo "===== run started $(date '+%Y-%m-%d %H:%M:%S %Z') ====="
-  "$PY" book_studio.py --confirm "$@"
+  "$PY" book_studio.py --confirm --headless "$@"
   echo "===== exit code $? ====="
 } >> "$LOG" 2>&1
