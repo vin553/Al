@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.alangkaar.studio-booking</string>
+
+  <!-- Replace __STUDIO_DIR__ with the absolute path of the studio-booking folder. -->
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>__STUDIO_DIR__/run.sh</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>__STUDIO_DIR__</string>
+
+  <!-- Every Sunday 10:00. launchd uses the Mac's local time zone: keep the Mac on Asia/Singapore. -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Weekday</key>
+    <integer>0</integer>
+    <key>Hour</key>
+    <integer>10</integer>
+    <key>Minute</key>
+    <integer>0</integer>
+  </dict>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>TZ</key>
+    <string>Asia/Singapore</string>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>__STUDIO_DIR__/logs/launchd.out</string>
+  <key>StandardErrorPath</key>
+  <string>__STUDIO_DIR__/logs/launchd.err</string>
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>

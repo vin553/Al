@@ -1,0 +1,6 @@
+# Linux alternative to the launchd job. Install with:  crontab -e  and paste the two lines below.
+# Replace __STUDIO_DIR__ with the absolute path of the studio-booking folder.
+# Every Sunday 10:00 Asia/Singapore. CRON_TZ works on cronie (most distros); on Debian/Ubuntu
+# vixie-cron ignore it, so either set the system time zone to Asia/Singapore or use "0 2 * * 0" (UTC).
+CRON_TZ=Asia/Singapore
+0 10 * * 0 /bin/bash __STUDIO_DIR__/run.sh
