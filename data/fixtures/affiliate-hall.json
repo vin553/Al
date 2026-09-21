@@ -1,0 +1,38 @@
+{
+ "address": "1 Invented Road, Singapore 000000",
+ "map": "https://maps.google.com/?q=example",
+ "push_rank": null,
+ "catering_policy": "Outside caterer welcome.",
+ "fire_ceremony": "Not answered yet",
+ "contact": "D. Example . d.example@invented-hall.test . 0000 0003",
+ "rates": [
+  {
+   "room": "Grand Ballroom L2 (pillarless)",
+   "capacity": 480,
+   "rate": "AFFILIATE 4h $7,777 off-peak / $8,888 peak",
+   "tax": "includes 9% GST",
+   "notes": ""
+  },
+  {
+   "room": "Seminar Room",
+   "capacity": 40,
+   "rate": "$444",
+   "tax": "+ 9% GST",
+   "notes": ""
+  }
+ ],
+ "rental_per_guest_all_in": 16.2,
+ "terms": "",
+ "includes": [],
+ "rules": [],
+ "addons": [],
+ "links": [],
+ "photos": [],
+ "originals": [],
+ "docs": [],
+ "next_action": "",
+ "updated": "19 Sep 2026",
+ "id": "affiliatehall",
+ "name": "Affiliate Community Hall, Grand Ballroom",
+ "status": "ALLOWED"
+}

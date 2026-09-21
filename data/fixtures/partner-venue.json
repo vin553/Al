@@ -1,0 +1,38 @@
+{
+ "address": "1 Invented Road, Singapore 000000",
+ "map": "https://maps.google.com/?q=example",
+ "push_rank": null,
+ "catering_policy": "Partner venue. Partner rate applies only when they bill us; we fold it into our package. Public rate $5,555 nett.",
+ "fire_ceremony": "Asked, not answered",
+ "contact": "C. Example . c.example@invented-space.test . 0000 0002",
+ "rates": [
+  {
+   "room": "Event space, half-day booking, PARTNER",
+   "capacity": 100,
+   "rate": "$3,333 nett",
+   "tax": "nett",
+   "notes": "confirmed in person"
+  },
+  {
+   "room": "Public rate (what clients pay direct)",
+   "capacity": 100,
+   "rate": "$5,555 nett",
+   "tax": "nett",
+   "notes": ""
+  }
+ ],
+ "rental_per_guest_all_in": 33.33,
+ "terms": "",
+ "includes": [],
+ "rules": [],
+ "addons": [],
+ "links": [],
+ "photos": [],
+ "originals": [],
+ "docs": [],
+ "next_action": "",
+ "updated": "19 Sep 2026",
+ "id": "partnervenue",
+ "name": "Partner Event Space",
+ "status": "ALLOWED"
+}

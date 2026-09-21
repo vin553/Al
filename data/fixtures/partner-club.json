@@ -1,0 +1,38 @@
+{
+ "address": "1 Invented Road, Singapore 000000",
+ "map": "https://maps.google.com/?q=example",
+ "push_rank": 1,
+ "catering_policy": "They asked us to be a preferred caterer. Partner rates under the Alangkaar agreement. They prefer the partner rate is not shown; a 'from' price or our package price is fine.",
+ "fire_ceremony": "Asked, no answer yet",
+ "contact": "B. Example . b.example@invented-club.test . 0000 0001",
+ "rates": [
+  {
+   "room": "Banquet Hall, PARTNER rate, weekdays and weekends",
+   "capacity": 200,
+   "rate": "Half day $1,111 . Full day $2,222",
+   "tax": "+ 9% GST",
+   "notes": "GST only, no service charge"
+  },
+  {
+   "room": "Banquet Hall, PUBLIC non-member card (reference)",
+   "capacity": 200,
+   "rate": "Weekday $1,555 . Weekend $1,888",
+   "tax": "++ (10% service + 9% GST)",
+   "notes": "members $999 weekday"
+  }
+ ],
+ "rental_per_guest_all_in": 7.11,
+ "terms": "",
+ "includes": [],
+ "rules": [],
+ "addons": [],
+ "links": [],
+ "photos": [],
+ "originals": [],
+ "docs": [],
+ "next_action": "",
+ "updated": "19 Sep 2026",
+ "id": "partnerclub",
+ "name": "Partner Country Club, Banquet Hall",
+ "status": "ALLOWED"
+}

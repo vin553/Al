@@ -1,0 +1,38 @@
+{
+ "address": "1 Invented Road, Singapore 000000",
+ "map": "https://maps.google.com/?q=example",
+ "push_rank": null,
+ "catering_policy": "Staying with their appointed caterers; no tender open. Public rate sheets kept for reference only.",
+ "fire_ceremony": "Not asked",
+ "contact": "E. Example . e.example@invented-yacht.test . 0000 0004",
+ "rates": [
+  {
+   "room": "Main Ballroom",
+   "capacity": 100,
+   "rate": "Weekday 4h $3,888 . 8h $5,888",
+   "tax": "++ (10% service + 9% GST)",
+   "notes": "external caterer charge $10++ per pax"
+  }
+ ],
+ "rental_per_guest_all_in": null,
+ "terms": "",
+ "includes": [],
+ "rules": [],
+ "addons": [
+  {
+   "n": "External caterer charge",
+   "p": 10,
+   "u": "per guest",
+   "auto": "perPax"
+  }
+ ],
+ "links": [],
+ "photos": [],
+ "originals": [],
+ "docs": [],
+ "next_action": "",
+ "updated": "19 Sep 2026",
+ "id": "blockedclub",
+ "name": "Blocked Yacht Club",
+ "status": "NOT ALLOWED"
+}

@@ -1,0 +1,40 @@
+{
+ "address": "1 Invented Road, Singapore 000000",
+ "map": "https://maps.google.com/?q=example",
+ "push_rank": null,
+ "catering_policy": "CONFIDENTIAL planner-exclusive rates: never publish; floor plans only shared privately; no contact between hotel and the couple.",
+ "fire_ceremony": "Not asked (ask 24 Sep)",
+ "contact": "A. Example . a.example@invented-hotel.test . 0000 0000",
+ "rates": [
+  {
+   "room": "Example Ballroom, 4 hours",
+   "capacity": 600,
+   "rate": "$11,111",
+   "tax": "++ (10% service + 9% GST)",
+   "notes": ""
+  },
+  {
+   "room": "Second Ballroom, 4 hours",
+   "capacity": null,
+   "rate": "$9,999",
+   "tax": "++ (10% service + 9% GST)",
+   "notes": "capacity not on file"
+  }
+ ],
+ "rental_per_guest_all_in": 18.52,
+ "terms": "",
+ "includes": [],
+ "rules": [],
+ "addons": [],
+ "links": [],
+ "photos": [],
+ "originals": [],
+ "docs": [
+  "README-CONFIDENTIAL.txt"
+ ],
+ "next_action": "",
+ "updated": "19 Sep 2026",
+ "id": "confidentialhotel",
+ "name": "Confidential Grand Hotel, Example Ballroom",
+ "status": "ALLOWED"
+}
