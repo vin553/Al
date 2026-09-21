@@ -1,0 +1,34 @@
+{
+ "address": "1 Invented Road, Singapore 000000",
+ "map": "https://maps.google.com/?q=example",
+ "push_rank": null,
+ "catering_policy": "Vegetarian only, temple kitchen rules apply.",
+ "fire_ceremony": "Yes (temple)",
+ "contact": "F. Example . f.example@invented-temple.test . 0000 0005",
+ "rates": [
+  {
+   "room": "Wedding Hall, full day",
+   "capacity": 500,
+   "rate": "$3,999",
+   "tax": "+ 9% GST",
+   "notes": ""
+  }
+ ],
+ "rental_per_guest_all_in": 8.0,
+ "terms": "",
+ "includes": [
+  "Tables and chairs",
+  "Basic sound system"
+ ],
+ "rules": [],
+ "addons": [],
+ "links": [],
+ "photos": [],
+ "originals": [],
+ "docs": [],
+ "next_action": "",
+ "updated": "19 Sep 2026",
+ "id": "templehall",
+ "name": "Example Temple, Wedding Hall",
+ "status": "VEGETARIAN TEMPLE"
+}

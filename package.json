@@ -11,6 +11,8 @@
     "typecheck": "tsc --noEmit",
     "seed": "tsx scripts/seed.ts",
     "refresh": "tsx scripts/refresh.ts",
+    "test:unit": "tsx --test tests/unit/*.test.ts",
+    "mcp:stdio": "tsx scripts/mcp-stdio.ts",
     "test:e2e": "playwright test",
     "screenshots": "playwright test tests/e2e/screenshots.spec.ts --project=chromium"
   },

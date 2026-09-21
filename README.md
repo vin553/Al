@@ -65,6 +65,30 @@ Instagram follower and Google review counts require `ig Graph API` / `Places API
 
 ---
 
+## Venue MCP server
+
+One server that Claude and ChatGPT both connect to, so they read the same venue
+and pricing data without either holding a copy of it.
+
+```bash
+pnpm mcp:stdio      # local server for Claude
+pnpm test:unit      # 32 tests, mostly disclosure rules
+```
+
+Google Drive stays the source of truth — the server reads the venue folders at
+request time. The point of the server is not access but **disclosure control**:
+some venues contractually forbid publishing their rates, some quote us a partner
+rate against a different public one, and every record carries staff contact
+details. Tools take an `audience`, decided by the transport and never by the
+caller, and the customer view withholds all of it.
+
+That is what makes connecting ChatGPT safe: it receives the customer view, and
+there is no argument it can pass or header it can send that changes this.
+
+Setup, tooling and the security model: **[docs/MCP-SERVER.md](./docs/MCP-SERVER.md)**.
+
+---
+
 ## Architecture
 
 ```
@@ -77,18 +101,26 @@ app/               Next 14 App Router
  └─ api/
       ├─ vendors/         GET dataset
       ├─ swot/            GET per-vendor SWOT (Anthropic or heuristic)
+      ├─ mcp/             MCP over Streamable HTTP (remote clients)
       └─ export-pdf/      GET streaming PDF (compare | vendor)
 components/        React UI (shadcn-style primitives + chart wrappers)
-lib/               db · vendor-types · swot · pdf · utils
+lib/
+ ├─ db · vendor-types · swot · pdf · utils
+ ├─ venues/          types · disclosure rules · Drive loader
+ └─ mcp/             tool definitions · JSON-RPC · HTTP access control
 data/
  ├─ vendors.seed.json   Committed research — source of truth
  ├─ vendors.db          SQLite (git-ignored, re-seeded on boot)
+ ├─ fixtures/           Synthetic venues for tests (no real rates)
  ├─ swot-cache/         Cached SWOT JSON per vendor
  └─ screenshots/        README screenshots (captured by Playwright)
 scripts/
  ├─ seed.ts          Reseed SQLite from JSON
+ ├─ mcp-stdio.ts     Local MCP server (pnpm mcp:stdio)
  └─ refresh.ts       Refresh agent (pnpm refresh)
-tests/e2e/          Playwright (3 flows + screenshots)
+tests/
+ ├─ unit/            node:test — disclosure and MCP access control
+ └─ e2e/             Playwright (3 flows + screenshots)
 ```
 
 ## Data model

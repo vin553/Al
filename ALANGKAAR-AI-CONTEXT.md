@@ -50,6 +50,14 @@ enquiry — those get the general link.
 
 Nothing is stored "inside" an assistant. Every assistant reads from these sources live.
 
+> **Preferred access: the venue MCP server.** Rather than reading the Drive
+> folder raw, connect an assistant to the Alangkaar venue MCP server. It serves
+> the same data but enforces the disclosure rules in §4 and §5 automatically —
+> confidential and partner rates, venue staff contacts and `NOT ALLOWED` venues
+> are withheld from customer-facing answers without the assistant having to be
+> trusted to apply them. See `docs/MCP-SERVER.md`. Raw Drive access is the
+> fallback, and puts the rules below entirely on the reader.
+
 ### Google Drive — venue and pricing master
 
 **`Venue-Master-Folder-19Sep2026`** (owner: vin@alangkaar.com)
