@@ -177,7 +177,8 @@ def book(page: Page, day: date, slot: str, confirm: bool) -> None:
         raise Stop(f"Submit clicked but no Studio booking for {day} appears in Booking History. Check {shot}")
     r = mine[0]
     log(f"BOOKED  date={day}  slot={label}  reference={r[0]}  status={r[5]}  fee-due={r[6]}  deposit-due={r[7]}  screenshot={shot}")
-    log("Pay the booking fee (S$21.80) and deposit (S$200) by PayNow / at the management office within 3 working days.")
+    log(f"PAY BY {r[6]}: booking fee S$21.80 + deposit S$200 via PayNow or the management office. "
+        "The portal cancels unpaid bookings exactly 72 h after booking, not 3 working days.")
 
 
 def parse_args() -> argparse.Namespace:

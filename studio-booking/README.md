@@ -21,7 +21,8 @@ The exact page flow and selectors are in `FLOW.md` (discovered 2026-09-19 on the
 
 - **Payment is manual.** Proceed creates a *Pending Approval* booking with PayNow (manual)
   selected. You must pay the booking fee (S$21.80) and deposit (S$200) by PayNow or at the
-  management office within 3 working days, or the portal cancels it ("cancelled by system due
+  management office within **72 hours of booking** (the script prints the exact due time), or the
+  portal cancels it ("cancelled by system due
   to unpaid booking fee"). To use DBS PayLah! for the deposit instead, change `pay_boxes` in
   `book_studio.py`; PayLah opens an online gateway the script does not complete.
 - **Portal rule: one Studio session per unit per calendar month.** A weekly schedule will be
