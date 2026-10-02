@@ -1,123 +1,90 @@
-# Studio auto-booking (iPlus Living, Piccadilly Grand)
+# Studio booking (iPlus Living, Piccadilly Grand)
 
-Books **one** Studio session on the condo's iPlus web portal (app.iplusliving.com) with
-Playwright. Default target: next Saturday, evening session (4pm–10pm), Singapore time.
+Books the condo **Studio** on the iPlus web portal (app.iplusliving.com) for unit #20-16.
+Everything goes through one command, `./studio`, run from this folder.
 
-The exact page flow and selectors are in `FLOW.md` (discovered 2026-09-19 on the live portal).
+## Everyday use
 
-## What it does
+```bash
+./studio status                      # what's booked + free Studio sessions next Saturday
+./studio status 2026-10-17           # same, for any date
+./studio try 2026-10-17 morning      # dry run: goes to the confirm step, books nothing
+./studio book 2026-10-17 morning     # real booking, one attempt
+./studio book                        # real booking, next Saturday evening (the default)
+./studio last                        # last scheduled-run log
+```
 
-1. Opens the login page, dismisses the "session expired" popup, logs in with username + password.
-2. Reads Booking History for upcoming bookings. Any active **Studio** booking stops the run.
-3. Opens Studio → Book Slot, moves the calendar to the target month, clicks the date, clicks the
-   session button, and checks the start/end fields filled in.
-4. Screenshots the confirm step. In dry-run mode it stops here.
-5. With `--confirm` it clicks **Submit** once. That opens a Payment page with a 5-minute hold.
-   The script ticks *Manual Payment (PayNow)* for the booking fee and for the deposit, ticks
-   the payment terms, clicks **Proceed**, then re-reads Booking History and prints the booking
-   code, status and fee due dates.
+Sessions: `morning` = 9am–3pm, `evening` = 4pm–10pm (the default).
+`status` never books anything, so it is always safe to run.
 
-## Read this before turning it on
+**After any booking, pay within 72 hours.** The script prints a `PAY BY` line with the exact
+time. Pay the booking fee (S$21.80) and deposit (S$200) by PayNow (QR code in the app's
+Documents section) or at the management office. The Payment page says "3 working days",
+but the portal cancels an unpaid booking exactly 72 hours after it was made.
 
-- **Payment is manual.** Proceed creates a *Pending Approval* booking with PayNow (manual)
-  selected. You must pay the booking fee (S$21.80) and deposit (S$200) by PayNow or at the
-  management office within **72 hours of booking** (the script prints the exact due time), or the
-  portal cancels it ("cancelled by system due
-  to unpaid booking fee"). To use DBS PayLah! for the deposit instead, change `pay_boxes` in
-  `book_studio.py`; PayLah opens an online gateway the script does not complete.
-- **Portal rule: one Studio session per unit per calendar month.** A weekly schedule will be
-  rejected by the portal after the first booking each month. The script reports the portal's
-  message and exits; it never retries.
-- **Bookings open 4 weeks ahead**, and the portal greys out today plus the next 3 days.
-- **Cancellations** must be made at least 1 week before the booked date (condo rule).
+## The weekly automatic booking
 
-## Guards (hard-coded, cannot be turned off from the command line)
+A scheduled cloud job runs every **Sunday 10:00 Singapore time** and books next Saturday
+evening. It needs no computer of yours to be on. It sends you a notification with the result:
+the booking code and the pay-by time, or why it did not book.
+
+It reads two environment variables, which you set once in the cloud environment's settings
+(environment menu in the session's title bar, then Edit):
+
+| Variable | Value |
+|---|---|
+| `IPLUS_USERNAME` | your iPlus login email |
+| `IPLUS_PASSWORD` | your iPlus password |
+
+Turn it off, or change its day or time, under Routines on claude.ai (it is named
+"Studio booking - Sunday 10:00"). To book the morning session instead, ask Claude to change
+the routine's command to `./studio book morning`.
+
+**Optional, instead of the cloud job: run it on your Mac.** One-time setup, then switch on:
+
+```bash
+./studio setup              # installs Python packages + browser, creates .env
+# put IPLUS_USERNAME and IPLUS_PASSWORD in .env
+./studio schedule on        # Sundays 10:00 (Mac on Singapore time, awake, logged in)
+./studio schedule off       # remove it
+```
+
+Use only one of the two, or both will try to book. The second would be refused by the
+one-booking guard, so this is noisy rather than harmful.
+
+## Guards (hard-coded)
 
 | Guard | Behaviour |
 |---|---|
-| 72 hours | Refuses if the session starts less than 72 h from now. Exit 2. No browser is opened. |
-| One booking | Reads Booking History (all statuses, upcoming dates). If an active Studio booking exists it prints it and exits 0. It never cancels anything. Other facilities' bookings are printed as info only. If the list cannot be read, it stops instead of assuming. |
-| Dry run by default | Only `--confirm` clicks Submit. `--dry-run` overrides `--confirm` if both are given. |
-| No retries | One attempt per run. Any unexpected page, timeout, or missing element saves a screenshot to `logs/`, prints the path, and exits 1. |
-| CAPTCHA | Stops if a *visible* reCAPTCHA, hCaptcha, or Turnstile widget appears. (The hidden one inside the Sign Up form is ignored.) |
-| Unbookable date | Stops if the portal marks the date unavailable, or the session button is missing, or the start/end fields did not fill in. |
+| 72 hours | Refuses if the session starts less than 72 h from now. No browser is opened. |
+| One booking | If any Studio booking is already active (pending, awaiting fee or confirmed, from today on), it prints it and stops. It never cancels anything. |
+| Dry run | `try` stops at the confirm step. Only `book` submits. |
+| No retries | One attempt per run. Any unexpected page saves a screenshot to `logs/` and stops. |
+| CAPTCHA | Stops if a visible CAPTCHA appears. No bypass. |
+| Portal says no | Stops if the date is greyed out, fully booked, or the session is taken. |
 
-## Setup
+## Portal facts worth knowing
 
-```bash
-cd studio-booking
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-playwright install chromium
-cp .env.example .env        # fill in IPLUS_USERNAME and IPLUS_PASSWORD
-```
+- Bookings open up to 4 weeks ahead. Today and the next 3 days are greyed out.
+- Submit only holds the slot for 5 minutes on a Payment page. The script ticks Manual Payment
+  (PayNow) for fee and deposit, accepts the payment terms and confirms. That creates the booking.
+- The condo terms say one Studio session per unit per calendar month. The portal does not
+  strictly enforce it: in October 2026 the unit holds two confirmed sessions (3 and 10 Oct).
+  The script's own rule is stricter: never more than one active booking at a time.
+- Cancellations must be made at least 1 week before the booked date (condo rule).
 
-`.env`, `profile/` and `logs/` are git-ignored. Never commit them.
-
-## Run manually
-
-```bash
-python3 book_studio.py --login                            # just log in and check the credentials
-python3 book_studio.py                                    # dry run, next Saturday evening
-python3 book_studio.py --date 2026-10-03 --slot morning   # dry run, specific date/slot
-python3 book_studio.py --confirm                          # actually book
-```
-
-Each run prints one timestamped line per step and the path of every screenshot.
-`--headless` hides the browser window (used by the scheduler).
-
-## Change the slot or day
-
-- Session: `--slot morning` (9am–3pm) or `--slot evening` (4pm–10pm). For the scheduled job,
-  add the flag on the `book_studio.py --confirm` line in `run.sh`.
-- Day: the default is next Saturday, computed in `next_saturday()` in `book_studio.py`.
-  Change the `5` (Monday = 0) for another weekday, or pass `--date` for a one-off.
-- Session hours live in the `SLOTS` table at the top of `book_studio.py`.
-
-## Schedule (every Sunday 10:00 Asia/Singapore)
-
-`run.sh` runs one `--confirm --headless` attempt and appends to `logs/YYYY-MM-DD.txt`.
-
-**macOS (launchd)**
-
-```bash
-DIR="$(pwd)"   # run from inside studio-booking
-sed "s|__STUDIO_DIR__|$DIR|g" scheduling/com.alangkaar.studio-booking.plist \
-  > ~/Library/LaunchAgents/com.alangkaar.studio-booking.plist
-launchctl load ~/Library/LaunchAgents/com.alangkaar.studio-booking.plist
-launchctl list | grep studio-booking        # should show the label
-```
-
-launchd fires on the Mac's local clock, so keep the Mac's time zone on Singapore, awake and
-logged in at 10:00 on Sunday (Energy Saver, or `caffeinate`).
-
-**Linux (cron)**: paste `scheduling/crontab.txt` into `crontab -e` after replacing the path.
-
-**Check the last log**
-
-```bash
-ls -t logs/*.txt | head -1 | xargs tail -n 30
-```
-
-Look for `BOOKED`, `EXISTING STUDIO BOOKING FOUND`, `REFUSED`, `STOPPED`, `DRY RUN` or `ERROR`.
-Screenshots from that run sit next to it in `logs/` with the same date prefix.
-
-**Turn it off**
-
-```bash
-launchctl unload ~/Library/LaunchAgents/com.alangkaar.studio-booking.plist   # macOS
-crontab -e   # Linux: delete the run.sh line
-```
-
-To remove it completely on macOS, also delete the plist from `~/Library/LaunchAgents`.
+Every selector and page step is documented in `FLOW.md`.
 
 ## Files
 
 | File | Purpose |
 |---|---|
-| `book_studio.py` | The booking script (about 220 lines) |
-| `discover.py` | Headed discovery helper; records every page and a trace (used for FLOW.md) |
-| `FLOW.md` | The discovered page flow, selectors and portal rules |
-| `run.sh` | Scheduler wrapper, writes `logs/YYYY-MM-DD.txt` |
-| `scheduling/` | launchd plist and crontab line |
-| `.env.example` | Credential template; copy to `.env` |
+| `studio` | The one command (status, try, book, last, setup, schedule) |
+| `book_studio.py` | The booking script behind it |
+| `FLOW.md` | The portal's page flow, selectors and rules, as discovered on 2026-09-19 |
+| `run.sh` | Entry point for the optional Mac/Linux schedule, logs to `logs/YYYY-MM-DD.txt` |
+| `scheduling/` | launchd plist and crontab line used by `./studio schedule on` |
+| `.env.example` | Credential template for `.env` (git-ignored, never committed) |
+
+The original discovery helper (`discover.py`) was removed once the flow was documented.
+It is in git history if the portal ever changes and the flow needs re-recording.

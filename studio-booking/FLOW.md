@@ -50,7 +50,7 @@ the Submit button. Nothing was booked. Screenshots and saved HTML of every page 
 | Fees shown | Booking fee S$21.80 flat (S$20 + GST, non-refundable), deposit S$200.00 (refundable) |
 | Sessions | Session 1 **0900–1500**, Session 2 **1600–2200**, daily |
 | How far ahead | Up to **4 weeks** in advance. Today and the next 3 days are greyed out (`css_not_available`/`grayColour`), so the portal itself enforces roughly a 72 h minimum. |
-| Portal rule | **Each unit may book one (1) Studio session per calendar month.** Booking fee must be paid by the due date or the booking is auto-cancelled ("Your booking cancelled by system due to unpaid booking fee" seen in history). Cancellation must be at least 1 week before. |
+| Portal rule | **Condo terms: each unit may book one (1) Studio session per calendar month.** Not strictly enforced by the portal: on 2026-10-02 the unit held two confirmed October sessions (SAB01525821 on 3 Oct, SAB01525823 on 10 Oct). Booking fee must be paid by the due date or the booking is auto-cancelled ("Your booking cancelled by system due to unpaid booking fee" seen in history). Cancellation must be at least 1 week before. |
 
 ## 4. Book Slot page (`/amenity/amenitybooking?amenity=<id>`)
 
@@ -58,7 +58,7 @@ the Submit button. Nothing was booked. Screenshots and saved HTML of every page 
 |---|---|
 | Calendar | FullCalendar in `#calendar`; month title `#calendar h2` ("September 2026"); `button.fc-next-button` / `button.fc-prev-button` |
 | Day cell | `td.fc-day-number[data-date='YYYY-MM-DD']`. Classes: `css_fully_available` (green, bookable), `css_not_available`/`css_not_available1 grayColour` (not bookable), fully-booked days are red per the legend. |
-| Day click | POSTs `/amenity/amenitygetslot` and renders slot buttons into `.amenitydayslot` |
+| Day click | POSTs `/amenity/amenitygetslot` and renders slot buttons into `.amenitydayslot`. A day the portal counts as fully occupied ignores the click and renders nothing; the script reports "no sessions (fully booked)". |
 | Slot buttons | `.amenitydayslot .bookingSlot` with `data-link-start="2026-09-26 16:00:00"` and `data-link-end="2026-09-26 22:00:00"`; visible text **"09:00 AM"** and **"04:00 PM"** |
 | Slot click | Fills the hidden selects `#bookingStartTime` (value `2026-09-26 16:00:00`, shows "04:00 PM") and `#bookingEndTime` (value `2026-09-26 22:00:00`, shows "10:00 PM"); the clicked button turns green |
 | Notes field | `#dynamicmodel-requestnote` (optional) |

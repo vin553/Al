@@ -6,7 +6,7 @@ Guards (hard-coded, not configurable from the CLI):
   b) refuses if an active Studio booking already exists (prints it, never cancels it)
   c) --dry-run is the default; Submit and the Payment page's Proceed only happen with --confirm
   d) any unexpected page or error -> screenshot to ./logs, print path, exit 1
-Selectors come from FLOW.md (discovered 2026-09-19).
+Selectors come from FLOW.md (discovered 2026-09-19). --status is read-only: what is booked + free sessions.
 """
 import argparse
 import json
@@ -116,7 +116,7 @@ def bookings(page: Page, day: date, amenity: str | None) -> list[list[str]]:
 
 
 def guard_existing_booking(page: Page, today: date) -> None:
-    others = [r for r in bookings(page, today, None) if r[5] in ACTIVE]
+    others = [r for r in bookings(page, today, None) if r[5] in ACTIVE and r[1] != "Studio"]
     for r in others:
         log(f"  info: other upcoming booking  {r[0]}  {r[1]}  {r[3]} - {r[4]}  [{r[5]}]")
     active = [r for r in bookings(page, today, STUDIO_ID) if r[5] in ACTIVE]
@@ -140,7 +140,10 @@ def open_day(page: Page, day: date) -> None:
     if "not_available" in cls or "grayColour" in cls:
         raise Stop(f"REFUSED: portal marks {day} as not bookable (class '{cls}'). Screenshot: {snap(page, 'day-unavailable')}")
     cell.click()
-    page.wait_for_selector(".amenitydayslot .bookingSlot", timeout=15_000)
+    try:  # free = .bookingSlot, taken = .grey; a fully-occupied day ignores the click and shows none
+        page.wait_for_selector(".amenitydayslot .slot", timeout=15_000)
+    except Exception:
+        raise Stop(f"REFUSED: portal offers no sessions on {day} (fully booked). Screenshot: {snap(page, 'no-sessions')}")
 
 
 def book(page: Page, day: date, slot: str, confirm: bool) -> None:
@@ -181,6 +184,22 @@ def book(page: Page, day: date, slot: str, confirm: bool) -> None:
         "The portal cancels unpaid bookings exactly 72 h after booking, not 3 working days.")
 
 
+def status(page: Page, day: date) -> None:
+    """Read-only: list upcoming bookings for the unit and the Studio sessions still free on `day`."""
+    rows = [r for r in bookings(page, datetime.now(SGT).date(), None) if r[5] in ACTIVE]
+    log("Upcoming bookings for the unit:" + ("" if rows else " none"))
+    for r in rows:
+        log(f"  {r[0]}  {r[1]:<24} {r[3]} - {r[4]}  [{r[5]}]")
+    try:
+        open_day(page, day)
+    except Stop as s:
+        log(f"Studio on {day:%a %d %b}: {str(s).replace('REFUSED: ', '')}")
+        return
+    free = [SLOTS[k][2] for k, (h0, _, _) in SLOTS.items()
+            if page.locator(P["slot"].format(start=f"{day} {h0:02d}:00:00")).count()]
+    log(f"Studio on {day:%a %d %b}: free sessions: {', '.join(free) or 'none (fully booked)'}")
+
+
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--date", type=date.fromisoformat, default=None, help="YYYY-MM-DD (default: next Saturday)")
@@ -188,6 +207,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--dry-run", action="store_true", help="stop before the Submit button (default)")
     p.add_argument("--confirm", action="store_true", help="actually click Submit")
     p.add_argument("--login", action="store_true", help="only log in to check the credentials, then exit")
+    p.add_argument("--status", action="store_true", help="read-only: show bookings and free sessions, book nothing")
     p.add_argument("--headless", action="store_true", help="no browser window (scheduled runs)")
     return p.parse_args()
 
@@ -196,10 +216,11 @@ def main() -> int:
     args = parse_args()
     now = datetime.now(SGT)
     day = args.date or next_saturday(now.date())
-    confirm = args.confirm and not args.dry_run
-    log(f"Target: {day} ({day:%A}) {SLOTS[args.slot][2]}  mode={'CONFIRM' if confirm else 'DRY RUN'}")
+    confirm = args.confirm and not args.dry_run and not args.status
+    mode = "STATUS (read-only)" if args.status else "CONFIRM" if confirm else "DRY RUN"
+    log(f"Target: {day} ({day:%A}) {SLOTS[args.slot][2]}  mode={mode}")
     try:
-        if not args.login:
+        if not (args.login or args.status):
             guard_lead_time(slot_start(day, args.slot), now)
     except Stop as s:
         log(str(s))
@@ -207,13 +228,18 @@ def main() -> int:
     with sync_playwright() as pw:  # error handling stays inside so screenshots can still be taken
         page = None
         try:
-            ctx = pw.chromium.launch_persistent_context(str(PROFILE), headless=args.headless,
+            proxy = {"server": os.environ["IPLUS_PROXY"]} if os.getenv("IPLUS_PROXY") else None  # cloud runs only
+            ctx = pw.chromium.launch_persistent_context(str(PROFILE), headless=args.headless, proxy=proxy,
+                                                        executable_path=os.getenv("IPLUS_CHROMIUM") or None,
                                                         viewport={"width": 1280, "height": 900})
             page = ctx.pages[0] if ctx.pages else ctx.new_page()
             page.set_default_timeout(20_000)
             ensure_logged_in(page)
             if args.login:
                 raise Stop("Login OK. Done.", 0)
+            if args.status:
+                status(page, day)
+                return 0
             guard_existing_booking(page, now.date())
             book(page, day, args.slot, confirm)
             return 0
