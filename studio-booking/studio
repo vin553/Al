@@ -1,0 +1,63 @@
+#!/bin/bash
+# studio - one command for the iPlus Studio booking. Run from anywhere:
+#   ./studio status [YYYY-MM-DD]                  what's booked + free Studio sessions (default: next Saturday)
+#   ./studio try    [YYYY-MM-DD] [morning|evening] dry run: goes to the confirm step, books nothing
+#   ./studio book   [YYYY-MM-DD] [morning|evening] real booking, one attempt (default: next Saturday evening)
+#   ./studio last                                  show the last scheduled-run log
+#   ./studio setup                                 one-time install on a Mac/Linux machine
+#   ./studio schedule on|off                       Sunday 10:00 SGT weekly job on this Mac/Linux machine
+# Credentials: IPLUS_USERNAME / IPLUS_PASSWORD from .env here, or from the environment (cloud runs).
+set -u
+DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$DIR" || exit 1
+export TZ=Asia/Singapore
+PY=python3
+[ -x .venv/bin/python ] && PY=.venv/bin/python
+CMD="${1:-status}"; shift || true
+DATE=""; SLOT="evening"; EXTRA=()
+for a in "$@"; do
+  case "$a" in
+    20??-??-??) DATE="$a" ;;
+    morning|evening) SLOT="$a" ;;
+    *) EXTRA+=("$a") ;;
+  esac
+done
+ARGS=(--slot "$SLOT"); [ -n "$DATE" ] && ARGS+=(--date "$DATE")
+
+cloud_prepare() {  # Claude Code cloud container: trust the egress proxy CA, pin the bundled Chromium
+  [ -n "${HTTPS_PROXY:-}" ] && [ -f /root/.ccr/agent-proxy-ca.crt ] || return 0
+  export IPLUS_PROXY="$HTTPS_PROXY"
+  [ -x /opt/pw-browsers/chromium ] && export IPLUS_CHROMIUM=/opt/pw-browsers/chromium
+  "$PY" -c "import playwright, dotenv" 2>/dev/null || pip3 install -q playwright python-dotenv >/dev/null 2>&1
+  command -v certutil >/dev/null || apt-get install -y -q libnss3-tools >/dev/null 2>&1 \
+    || { apt-get update -q >/dev/null 2>&1; apt-get install -y -q libnss3-tools >/dev/null 2>&1; }
+  mkdir -p "$HOME/.pki/nssdb"
+  certutil -d "sql:$HOME/.pki/nssdb" -L -n ccr-agent-proxy >/dev/null 2>&1 \
+    || certutil -d "sql:$HOME/.pki/nssdb" -A -n ccr-agent-proxy -t "C,," -i /root/.ccr/agent-proxy-ca.crt
+  EXTRA+=(--headless)
+}
+
+case "$CMD" in
+  status) cloud_prepare; exec "$PY" book_studio.py --status "${ARGS[@]}" "${EXTRA[@]}" ;;
+  try)    cloud_prepare; exec "$PY" book_studio.py --dry-run "${ARGS[@]}" "${EXTRA[@]}" ;;
+  book)   cloud_prepare; exec "$PY" book_studio.py --confirm "${ARGS[@]}" "${EXTRA[@]}" ;;
+  last)   f=$(ls -t logs/20??-??-??.txt 2>/dev/null | head -1); [ -n "$f" ] && tail -n 30 "$f" || echo "No run logs yet." ;;
+  setup)
+    python3 -m venv .venv && .venv/bin/pip install -q -r requirements.txt && .venv/bin/playwright install chromium
+    [ -f .env ] || { cp .env.example .env; echo "Created .env - put your iPlus username and password in it."; } ;;
+  schedule)
+    PLIST="$HOME/Library/LaunchAgents/com.alangkaar.studio-booking.plist"
+    if [ "${EXTRA[0]:-}" = "off" ]; then
+      if [ "$(uname)" = Darwin ]; then launchctl unload "$PLIST" 2>/dev/null; rm -f "$PLIST"
+      else crontab -l 2>/dev/null | grep -v "$DIR/run.sh" | crontab -; fi
+      echo "Weekly job removed."
+    elif [ "$(uname)" = Darwin ]; then
+      mkdir -p "$HOME/Library/LaunchAgents" logs
+      sed "s|__STUDIO_DIR__|$DIR|g" scheduling/com.alangkaar.studio-booking.plist > "$PLIST"
+      launchctl unload "$PLIST" 2>/dev/null; launchctl load "$PLIST" && echo "Weekly job on: Sundays 10:00 (Mac must be on Singapore time and awake)."
+    else
+      (crontab -l 2>/dev/null | grep -v "$DIR/run.sh"; echo "CRON_TZ=Asia/Singapore"; echo "0 10 * * 0 /bin/bash $DIR/run.sh") | crontab -
+      echo "Weekly job on: Sundays 10:00 Asia/Singapore (cron)."
+    fi ;;
+  *) sed -n '2,9p' "$0"; exit 2 ;;
+esac
