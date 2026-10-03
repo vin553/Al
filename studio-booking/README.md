@@ -85,6 +85,7 @@ Every selector and page step is documented in `FLOW.md`.
 | `run.sh` | Entry point for the optional Mac/Linux schedule, logs to `logs/YYYY-MM-DD.txt` |
 | `scheduling/` | launchd plist and crontab line used by `./studio schedule on` |
 | `.env.example` | Credential template for `.env` (git-ignored, never committed) |
+| `CLIENT_DIRECTIONS.md` | Ready-to-send directions for clients meeting Vin at the Studio |
 
 The original discovery helper (`discover.py`) was removed once the flow was documented.
 It is in git history if the portal ever changes and the flow needs re-recording.
